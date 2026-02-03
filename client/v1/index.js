@@ -30,8 +30,7 @@ console.log(MY_FAVORITE_DEALERS[0]);
 // 1. Create a new variable and assign it the link of the lego set with the highest reduction I can find on these 2 websites
 // 2. Log the variable
 
-const HIGHEST_REDUCTION_LEGO_SET =
-    'https://www.dealabs.com/bons-plans/selection-de-lego-et-produits-derives-en-destockage-ex-la-vespa-lego-creator-40517-3243471';
+const HIGHEST_REDUCTION_LEGO_SET = 'https://www.dealabs.com/bons-plans/selection-de-lego-et-produits-derives-en-destockage-ex-la-vespa-lego-creator-40517-3243471';
 
 console.log(HIGHEST_REDUCTION_LEGO_SET);
 
@@ -62,11 +61,7 @@ console.log(NUMBER_OF_DEALS);
 const SHOPPING_COMMUNITIES = deals.map(deal => deal.community);
 
 console.log(SHOPPING_COMMUNITIES);
-
-const UNIQUE_SHOPPING_COMMUNITIES = [...new Set(SHOPPING_COMMUNITIES)];
-
-console.log(UNIQUE_SHOPPING_COMMUNITIES);
-console.log(UNIQUE_SHOPPING_COMMUNITIES.length);
+console.log(new Set(SHOPPING_COMMUNITIES).size);
 
 // 🎯 TODO 4: Sort by price
 // 1. Create a function to sort the deals by price
@@ -74,16 +69,26 @@ console.log(UNIQUE_SHOPPING_COMMUNITIES.length);
 // 3. Log the variable
 
 function sortDealsByPrice(dealsList) {
-    return [...dealsList].sort((a, b) => a.price - b.price);
+    return dealsList.sort((a, b) => a.price - b.price);
 }
 const DEALS_SORTED_BY_PRICE = sortDealsByPrice(deals);
 console.log(DEALS_SORTED_BY_PRICE);
+
 
 
 // 🎯 TODO 5: Sort by date
 // 1. Create a function to sort the deals by date
 // 2. Create a variable and assign it the list of deals by date from recent to old
 // 3. Log the variable
+
+function sortDealsByDate(dealsList) {
+    return dealsList.sort((a, b) => b.published - a.published);
+}
+
+const DEALS_SORTED_BY_DATE = sortDealsByDate(deals);
+
+console.log(DEALS_SORTED_BY_DATE);
+
 
 // 🎯 TODO 6: Filter a specific percentage discount range
 // 1. Filter the list of deals between 50% and 75%
