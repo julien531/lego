@@ -30,6 +30,12 @@ console.log(MY_FAVORITE_DEALERS[0]);
 // 1. Create a new variable and assign it the link of the lego set with the highest reduction I can find on these 2 websites
 // 2. Log the variable
 
+const HIGHEST_REDUCTION_LEGO_SET =
+    'https://www.dealabs.com/bons-plans/selection-de-lego-et-produits-derives-en-destockage-ex-la-vespa-lego-creator-40517-3243471';
+
+console.log(HIGHEST_REDUCTION_LEGO_SET);
+
+
 /**
  * 🧱
  * Easy 😁?
@@ -43,15 +49,36 @@ console.log(MY_FAVORITE_DEALERS[0]);
 // 1. Create a variable and assign it the number of deals
 // 2. Log the variable
 
+const NUMBER_OF_DEALS = deals.length;
+
+console.log(NUMBER_OF_DEALS);
+
+
 // 🎯 TODO 3: Website name
 // 1. Create a variable and assign it the list of shopping community name only
 // 2. Log the variable
 // 3. Log how many shopping communities we have
 
+const SHOPPING_COMMUNITIES = deals.map(deal => deal.community);
+
+console.log(SHOPPING_COMMUNITIES);
+
+const UNIQUE_SHOPPING_COMMUNITIES = [...new Set(SHOPPING_COMMUNITIES)];
+
+console.log(UNIQUE_SHOPPING_COMMUNITIES);
+console.log(UNIQUE_SHOPPING_COMMUNITIES.length);
+
 // 🎯 TODO 4: Sort by price
 // 1. Create a function to sort the deals by price
 // 2. Create a variable and assign it the list of sets by price from lowest to highest
 // 3. Log the variable
+
+function sortDealsByPrice(dealsList) {
+    return [...dealsList].sort((a, b) => a.price - b.price);
+}
+const DEALS_SORTED_BY_PRICE = sortDealsByPrice(deals);
+console.log(DEALS_SORTED_BY_PRICE);
+
 
 // 🎯 TODO 5: Sort by date
 // 1. Create a function to sort the deals by date
