@@ -518,6 +518,14 @@ console.log(now);
 // 1. Find the item with the uuid `f2c5377c-84f9-571d-8712-98902dcbb913`
 // 2. Log the item
 
+function findItemByUuid(list, uuid) {
+    return list.find(item => item.uuid === uuid);
+}
+
+const item = findItemByUuid(VINTED, 'f2c5377c-84f9-571d-8712-98902dcbb913');
+console.log(item);
+
+
 // 🎯 TODO 14: Delete a specific item
 // 1. Delete the item with the uuid `f2c5377c-84f9-571d-8712-98902dcbb913`
 // 2. Log the new list of items
