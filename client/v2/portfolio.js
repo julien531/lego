@@ -131,7 +131,8 @@ const renderIndicators = pagination => {
 };
 
 const render = (deals, pagination) => {
-  renderDeals(deals);
+    const filteredDeals = applyFilter(deals) //changed filter deals
+  renderDeals(filteredDeals);
   renderPagination(pagination);
   renderIndicators(pagination);
   renderLegoSetIds(deals)
@@ -145,18 +146,83 @@ const render = (deals, pagination) => {
  * Select the number of deals to display
  */
 selectShow.addEventListener('change', async (event) => {
-  const deals = await fetchDeals(currentPagination.currentPage, parseInt(event.target.value));
+  const deals = await fetchDeals(currentPagination.currentPage, parseInt(event.target.value)); // parseInt ne sert pas [6,12,24]
 
   setCurrentDeals(deals);
   render(currentDeals, currentPagination);
 });
 
 selectPage.addEventListener('change', async (event) => {
-    const deals = await fetchDeals(parseInt(event.target.value), parseInt(selectShow.value));
+    const deals = await fetchDeals(parseInt(event.target.value), parseInt(selectShow.value)); // parseInt des Integers 
 
     setCurrentDeals(deals);
     render(currentDeals, currentPagination);
 });
+
+
+// Feature 2, 3, 4: filters
+let activeFilter = null;
+
+const applyFilter = function (deals) {
+
+    if (!activeFilter) { return deals; }
+
+    if (activeFilter == 'discount') {
+        var filtered = [];
+        for (var i = 0; i < deals.length; i++) {
+            if (deals[i].discount > 50) {
+                filtered.push(deals[i]);
+            }
+        }
+        return filtered;
+    }
+
+    if (activeFilter == 'commented') {
+        var filtered = [];
+        for (var i = 0; i < deals.length; i++) {
+            if (deals[i].comments > 15) {
+                filtered.push(deals[i]);
+            }
+        }
+        return filtered;
+    }
+
+    if (activeFilter == 'hot') {
+        var filtered = [];
+        for (var i = 0; i < deals.length; i++) {
+            if (deals[i].temperature > 100) {
+                filtered.push(deals[i]);
+            }
+        }
+        return filtered;
+    }
+
+    return deals;
+};
+
+const filterContainer = document.querySelector('#filters');
+
+filterContainer.addEventListener('click', (event) => {
+    const text = event.target.textContent;
+
+    if (text === 'By best discount') {
+        if (activeFilter == 'discount') { activeFilter = null; }
+        else { activeFilter = 'discount'; }
+    }
+
+    if (text === 'By most commented') {
+        if (activeFilter == 'commented') { activeFilter = null; }
+        else { activeFilter = 'commented'; }
+    }
+
+    if (text === 'By hot deals') {
+        if (activeFilter == 'hot') { activeFilter = null; }
+        else { activeFilter = 'hot'; }
+    }
+
+    render(currentDeals, currentPagination);
+});
+
 
 
 
