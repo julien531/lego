@@ -117,7 +117,7 @@ console.log(averageDiscount);
  */
 
 // 🎯 TODO 8: Deals by community
-// 1. Create an object called `communities` to manipulate deals by community name 
+// 1. Create an object called `communities` to manipulate deals by community name
 // The key is the community name
 // The value is the array of deals for this specific community
 //
@@ -131,6 +131,28 @@ console.log(averageDiscount);
 //
 // 2. Log the variable
 // 3. Log the number of deals by community
+
+const communities = deals.reduce((accumulator, deal) => {
+    const communityName = deal.community;
+
+    if (!accumulator[communityName]) {
+        accumulator[communityName] = [];
+    }
+
+    accumulator[communityName].push(deal);
+
+    return accumulator;
+}, {});
+
+console.log(communities);
+
+for (const communityName in communities) {
+    console.log(
+        `${communityName}: ${communities[communityName].length} deals`
+    );
+}
+
+
 
 // 🎯 TODO 9: Sort by price for each community
 // 1. For each community, sort the deals by discount price, from highest to lowest
