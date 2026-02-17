@@ -278,3 +278,83 @@ document.addEventListener('DOMContentLoaded', async () => {
   setCurrentDeals(deals);
   render(currentDeals, currentPagination);
 });
+
+
+
+const spanNbSales = document.querySelector('#nbSales');
+const indicatorsSection = document.querySelector('#indicators');
+
+const fetchSales = async (id) => {
+    try {
+        const response = await fetch(
+            `https://lego-api-blue.vercel.app/sales?id=${id}`
+        );
+        const body = await response.json();
+
+        if (body.success !== true) {
+            return null;
+        }
+        return body.data.result;
+    } catch (error) {
+        return null;
+    }
+};
+
+const renderSales = (sales) => {
+    const indicatorDivs = document.querySelectorAll('#indicators > div');
+
+    const nbSalesSpan = indicatorDivs[1].querySelector('span:last-child');
+    const avgSpan = indicatorDivs[2].querySelector('span:last-child');
+    const p5Span = indicatorDivs[3].querySelector('span:last-child');
+    const p25Span = indicatorDivs[4].querySelector('span:last-child');
+    const p50Span = indicatorDivs[5].querySelector('span:last-child');
+    const lifetimeSpan = indicatorDivs[6].querySelector('span:last-child');
+
+    if (!sales || sales.length === 0) {
+        nbSalesSpan.textContent = 0;
+        avgSpan.textContent = 0;
+        p5Span.textContent = 0;
+        p25Span.textContent = 0;
+        p50Span.textContent = 0;
+        lifetimeSpan.textContent = '0 days';
+        return;
+    }
+
+    nbSalesSpan.textContent = sales.length;
+
+    const prices = sales
+        .map(sale => Number(sale.price.amount))
+        .sort((a, b) => a - b);
+
+    const sum = prices.reduce((acc, price) => acc + price, 0);
+    const average = sum / prices.length;
+    avgSpan.textContent = average.toFixed(2) + ' $';
+
+    const getPercentile = (arr, percentile) => {
+        const index = Math.floor(percentile * (arr.length - 1));
+        return arr[index];
+    };
+
+    p5Span.textContent = getPercentile(prices, 0.05) + ' $';
+    p25Span.textContent = getPercentile(prices, 0.25) + ' $';
+    p50Span.textContent = getPercentile(prices, 0.5) + ' $';
+
+    const dates = sales.map(sale => sale.published);
+    const minDate = Math.min(...dates);
+    const maxDate = Math.max(...dates);
+
+    const lifetimeDays = Math.floor((maxDate - minDate) / (60 * 60 * 24));
+    const lifetime80Days = Math.floor(lifetimeDays * 0.8);
+    lifetimeSpan.textContent = lifetime80Days + ' days';
+};
+
+
+
+
+selectLegoSetIds.addEventListener('change', async (event) => {
+    const id = event.target.value;
+
+    const salesData = await fetchSales(id);
+    renderSales(salesData);
+});
+
