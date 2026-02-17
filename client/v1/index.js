@@ -578,7 +578,7 @@ console.log(sealedCamera);
 console.log(camera);
 
 
-// 🎯 TODO 11: Compute the profitability
+// 🎯 TODO 16: Compute the profitability
 // From a specific deal called `deal`
 const deal = {
   'title':  'La caméra Hommage à Walt Disney',
@@ -587,8 +587,30 @@ const deal = {
   'legoId': '43230'
 }
 
+function computeProfitability(deal) {
+    return ((deal.retail - deal.price) / deal.retail) * 100;
+}
+
+const profitPercent = computeProfitability(deal);
+console.log(`Profitability: ${profitPercent.toFixed(2)}%`);
+
+
 // 1. Compute the potential highest profitability based on the VINTED items
 // 2. Log the value
+
+const retailPrice = deal.retail;
+
+const profitabilities = VINTED.map(item => ((retailPrice - parseFloat(item.price)) / retailPrice) * 100);
+const highestProfitability = Math.max(...profitabilities);
+
+console.log(`Highest potential profitability: ${highestProfitability.toFixed(2)}%`);
+
+
+const profits = VINTED.map(item => retailPrice - parseFloat(item.price));
+const maxProfit = Math.max(...profits);
+
+console.log(`Maximum potential profit: ${maxProfit.toFixed(2)} €`);
+
 
 
 
