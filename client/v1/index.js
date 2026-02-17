@@ -173,6 +173,14 @@ console.log(communities);
 // 1. For each set, sort the deals by date, from old to recent
 // 2. Log the sort
 
+for (const communityName in communities) {
+    communities[communityName].sort(
+        (a, b) => a.published - b.published
+    );
+}
+
+console.log(communities);
+
 
 /**
  * 🧥
