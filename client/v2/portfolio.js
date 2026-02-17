@@ -132,7 +132,8 @@ const renderIndicators = pagination => {
 
 const render = (deals, pagination) => {
     const filteredDeals = applyFilter(deals) //changed filter deals
-  renderDeals(filteredDeals);
+    var sortedDeals = applySort(filteredDeals); //changed sort deals
+  renderDeals(sortedDeals);
   renderPagination(pagination);
   renderIndicators(pagination);
   renderLegoSetIds(deals)
@@ -220,6 +221,51 @@ filterContainer.addEventListener('click', (event) => {
         else { activeFilter = 'hot'; }
     }
 
+    render(currentDeals, currentPagination);
+});
+
+
+var activeSort = null;
+
+var applySort = function (deals) {
+
+    if (!activeSort) {
+        return deals;
+    }
+
+    var sorted = deals.slice(); // copy array
+
+    if (activeSort == 'price-asc') {
+        sorted.sort(function (a, b) {
+            return a.price - b.price;
+        });
+    }
+
+    if (activeSort == 'price-desc') {
+        sorted.sort(function (a, b) {
+            return b.price - a.price;
+        });
+    }
+
+    if (activeSort == 'date-asc') {
+        sorted.sort(function (a, b) {
+            return a.published - b.published;
+        });
+    }
+
+    if (activeSort == 'date-desc') {
+        sorted.sort(function (a, b) {
+            return b.published - a.published;
+        });
+    }
+
+    return sorted;
+};
+
+var selectSort = document.querySelector('#sort-select');
+
+selectSort.addEventListener('change', function (event) {
+    activeSort = event.target.value;
     render(currentDeals, currentPagination);
 });
 
