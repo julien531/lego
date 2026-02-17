@@ -538,7 +538,7 @@ const updatedList = deleteItemByUuid(VINTED, 'f2c5377c-84f9-571d-8712-98902dcbb9
 console.log(updatedList);
 
 
-// 🎯 TODO 5: Save a favorite item
+// 🎯 TODO 15: Save a favorite item
 // We declare and assign a variable called `sealedCamera`
 let sealedCamera = {
   link: "https://www.vinted.fr/items/5563396347-lego-43230-omaggio-a-walter-disney-misb",
@@ -555,7 +555,12 @@ let camera = sealedCamera;
 camera.favorite = true;
 
 // 1. Log `sealedCamera` and `camera` variables
+
+console.log(sealedCamera);
+console.log(camera);
+
 // 2. What do you notice?
+// Both have favorite and set as true
 
 // we make (again) a new assignment again
 sealedCamera = {
@@ -567,6 +572,10 @@ sealedCamera = {
 };
 
 // 3. Update `camera` property with `favorite` to true WITHOUT changing sealedCamera properties
+camera = Object.assign({}, sealedCamera, { favorite: true });
+
+console.log(sealedCamera);
+console.log(camera);
 
 
 // 🎯 TODO 11: Compute the profitability
