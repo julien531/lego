@@ -501,6 +501,19 @@ console.log("p25:", p25);
 // // 1. Log if we have very old items (true or false)
 // // A very old item is an item `published` more than 3 weeks ago.
 
+const THREE_WEEKS_MS = 3 * 7 * 24 * 60 * 60 * 1000; // 3 weeks in ms
+
+const now = new Date();
+
+const hasVeryOldItems = VINTED.some(item => {
+    const publishedDate = new Date(item.published);
+    return now - publishedDate > THREE_WEEKS_MS;
+});
+
+console.log(hasVeryOldItems);
+console.log(now);
+
+
 // 🎯 TODO 13: Find a specific item
 // 1. Find the item with the uuid `f2c5377c-84f9-571d-8712-98902dcbb913`
 // 2. Log the item
