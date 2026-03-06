@@ -1,83 +1,479 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>🧱 Lego | Predictability of a lego set deal</title>
-  </head>
-  <body>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+    <style>
+        /* ── RESET ──────────────────────────────────────────── */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --yellow: #FFD700;
+            --yellow-d: #C9A800;
+            --red: #E3000B;
+            --black: #111111;
+            --white: #FAFAF8;
+            --surface: #F3F2EE;
+            --border: #E2E0D8;
+            --muted: #8A8880;
+            --text: #1C1B19;
+            --radius: 8px;
+            --shadow: 0 1px 4px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── PAGE HEADING ───────────────────────────────────── */
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.6rem;
+            letter-spacing: .08em;
+            background: var(--black);
+            color: var(--yellow);
+            padding: 1.2rem 2rem;
+            border-bottom: 4px solid var(--yellow);
+        }
+
+        h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1rem;
+            letter-spacing: .1em;
+            color: var(--muted);
+            margin-bottom: .75rem;
+        }
+
+        /* ── OPTIONS BAR ────────────────────────────────────── */
+        #options {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: .6rem 1.2rem;
+            padding: .85rem 2rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 2px 8px rgba(0,0,0,.05);
+        }
+
+            #options > div {
+                display: flex;
+                align-items: center;
+                gap: .45rem;
+            }
+
+            #options label {
+                font-size: .7rem;
+                font-weight: 600;
+                letter-spacing: .1em;
+                text-transform: uppercase;
+                color: var(--muted);
+            }
+
+        select {
+            appearance: none;
+            background-color: var(--surface);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A8880'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right .65rem center;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            padding: .38rem 1.9rem .38rem .65rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .82rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: border-color .15s, box-shadow .15s;
+        }
+
+            select:hover, select:focus {
+                border-color: var(--yellow-d);
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(255,215,0,.2);
+            }
+
+        /* ── FILTER PILLS ───────────────────────────────────── */
+        #filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+        }
+
+            #filters span {
+                cursor: pointer;
+                font-size: .73rem;
+                font-weight: 600;
+                letter-spacing: .04em;
+                padding: .28rem .75rem;
+                border-radius: 99px;
+                border: 1.5px solid var(--border);
+                background: var(--surface);
+                color: var(--muted);
+                transition: all .15s;
+                user-select: none;
+            }
+
+                #filters span:hover {
+                    border-color: var(--yellow-d);
+                    color: var(--text);
+                    background: #FFFBE6;
+                }
+
+        /* ── LEGO SECTION ───────────────────────────────────── */
+        #lego {
+            padding: 1.25rem 2rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+
+            #lego > div {
+                display: flex;
+                align-items: center;
+                gap: .55rem;
+            }
+
+                #lego > div > label {
+                    font-size: .7rem;
+                    font-weight: 600;
+                    letter-spacing: .1em;
+                    text-transform: uppercase;
+                    color: var(--muted);
+                }
+
+        /* ── DEALS SECTION ──────────────────────────────────── */
+        #deals {
+            padding: 1.5rem 2rem;
+        }
+
+            /* The div JS injects all .deal cards into */
+            #deals > div {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+                gap: 1rem;
+            }
+
+            /* Section heading injected by renderDeals */
+            #deals > h2 {
+                margin-bottom: .75rem;
+            }
+
+        .deal {
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: .9rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+            transition: box-shadow .15s, transform .15s, border-color .15s;
+            animation: fadeUp .3s ease both;
+        }
+
+            .deal:hover {
+                box-shadow: var(--shadow);
+                transform: translateY(-2px);
+                border-color: var(--yellow);
+            }
+
+            /* id span */
+            .deal > span:first-child {
+                font-size: .65rem;
+                font-weight: 700;
+                letter-spacing: .1em;
+                text-transform: uppercase;
+                color: var(--muted);
+            }
+
+            /* title link */
+            .deal > a {
+                font-size: .88rem;
+                font-weight: 500;
+                color: var(--text);
+                text-decoration: none;
+                line-height: 1.4;
+                flex: 1;
+            }
+
+                .deal > a:hover {
+                    color: var(--red);
+                    text-decoration: underline;
+                }
+
+            /* price span */
+            .deal > span:nth-child(3) {
+                font-family: 'Bebas Neue', sans-serif;
+                font-size: 1.35rem;
+                letter-spacing: .03em;
+                color: var(--black);
+                margin-top: auto;
+            }
+
+        /* favorite button */
+        .favorite-btn {
+            align-self: flex-end;
+            background: none;
+            border: 1.5px solid var(--border);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: .9rem;
+            line-height: 1;
+            transition: all .15s;
+            color: var(--muted);
+            padding: 0;
+        }
+
+            .favorite-btn:hover {
+                border-color: var(--yellow-d);
+                color: var(--yellow-d);
+                background: #FFFBE6;
+            }
+
+        /* ── SALES SECTION ──────────────────────────────────── */
+        #sales {
+            padding: 1.25rem 2rem;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sale {
+            display: flex;
+            align-items: baseline;
+            gap: .75rem;
+            padding: .55rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: .84rem;
+        }
+
+            .sale:last-child {
+                border-bottom: none;
+            }
+
+            .sale > span:first-child {
+                font-size: .7rem;
+                font-weight: 600;
+                color: var(--muted);
+                min-width: 68px;
+                white-space: nowrap;
+            }
+
+            .sale > a {
+                flex: 1;
+                color: var(--text);
+                text-decoration: none;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+                .sale > a:hover {
+                    color: var(--red);
+                }
+
+            .sale > span:last-child {
+                font-family: 'Bebas Neue', sans-serif;
+                font-size: 1rem;
+                white-space: nowrap;
+                color: var(--black);
+            }
+
+        /* ── INDICATORS SECTION ─────────────────────────────── */
+        #indicators {
+            padding: 1.25rem 2rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+
+            #indicators > div {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: .55rem 0;
+                border-bottom: 1px solid var(--border);
+            }
+
+                #indicators > div:last-child {
+                    border-bottom: none;
+                }
+
+                #indicators > div > span:first-child {
+                    font-size: .82rem;
+                    color: var(--muted);
+                    font-weight: 500;
+                }
+
+                #indicators > div > span:last-child {
+                    font-family: 'Bebas Neue', sans-serif;
+                    font-size: 1.1rem;
+                    letter-spacing: .04em;
+                    color: var(--text);
+                }
+
+        /* ── ANIMATIONS ─────────────────────────────────────── */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .deal:nth-child(1) {
+            animation-delay: .04s
+        }
+
+        .deal:nth-child(2) {
+            animation-delay: .08s
+        }
+
+        .deal:nth-child(3) {
+            animation-delay: .12s
+        }
+
+        .deal:nth-child(4) {
+            animation-delay: .16s
+        }
+
+        .deal:nth-child(5) {
+            animation-delay: .20s
+        }
+
+        .deal:nth-child(6) {
+            animation-delay: .24s
+        }
+
+        .deal:nth-child(7) {
+            animation-delay: .28s
+        }
+
+        .deal:nth-child(8) {
+            animation-delay: .32s
+        }
+
+        .deal:nth-child(9) {
+            animation-delay: .36s
+        }
+
+        .deal:nth-child(10) {
+            animation-delay: .40s
+        }
+
+        .deal:nth-child(11) {
+            animation-delay: .44s
+        }
+
+        .deal:nth-child(12) {
+            animation-delay: .48s
+        }
+
+        /* ── SCROLLBAR ──────────────────────────────────────── */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
     <h1>Lego</h1>
     <section id="options">
-      <div id="show">
-        <label for="show-select">Show:</label>
-        <select name="show" id="show-select">
-          <option value="6">6</option>
-          <option value="12">12</option>
-          <option value="24">24</option>
-        </select>
-      </div>
-      <div id="page">
-        <label for="page-select">Go to page:</label>
-        <select name="page" id="page-select"> </select>
-      </div>
-      <div id="filters">
-        <span>By best discount</span>
-        <span>By most commented</span>
-        <span>By hot deals</span>
-        <span>By favorites</span>
-      </div>
-      <div id="sort">
-        <label for="sort-select">Sort:</label>
-        <select name="sort" id="sort-select">
-          <option value="price-asc">Cheaper</option>
-          <option value="price-desc">Expensive</option>
-          <option value="date-asc">Recently published</option>
-          <option value="date-desc">Anciently published</option>
-        </select>
-      </div>
+        <div id="show">
+            <label for="show-select">Show:</label>
+            <select name="show" id="show-select">
+                <option value="6">6</option>
+                <option value="12">12</option>
+                <option value="24">24</option>
+            </select>
+        </div>
+        <div id="page">
+            <label for="page-select">Go to page:</label>
+            <select name="page" id="page-select"> </select>
+        </div>
+        <div id="filters">
+            <span>By best discount</span>
+            <span>By most commented</span>
+            <span>By hot deals</span>
+            <span>By favorites</span>
+        </div>
+        <div id="sort">
+            <label for="sort-select">Sort:</label>
+            <select name="sort" id="sort-select">
+                <option value="price-asc">Cheaper</option>
+                <option value="price-desc">Expensive</option>
+                <option value="date-asc">Recently published</option>
+                <option value="date-desc">Anciently published</option>
+            </select>
+        </div>
     </section>
     <section id="lego">
-      <h2>Lego sets</h2>
-      <div>
-        <label>Lego set id:</label>
-        <select id="lego-set-id-select"></select> 
-      </div>
+        <h2>Lego sets</h2>
+        <div>
+            <label>Lego set id:</label>
+            <select id="lego-set-id-select"></select>
+        </div>
     </section>
     <section id="sales">
-      <h2>Vinted sales</h2>
+        <h2>Vinted sales</h2>
     </section>
     <section id="indicators">
-      <h2>Indicators</h2>
-      <div>
-        <span>Number of deals</span>
-        <span id="nbDeals">0</span>
-      </div>
-      <div>
-        <span>Number of sales</span>
-        <span id="nbSales">0</span>
-      </div>
-      <div>
-        <span>average sales price value</span>
-        <span>0</span>
-      </div>
-      <div>
-        <span>p5 sales price value</span>
-        <span>0</span>
-      </div>
-      <div>
-        <span>p25 sales price value</span>
-        <span>0</span>
-      </div>
-      <div>
-        <span>p50 sales price value</span>
-        <span>0</span>
-      </div>
-      <div>
-        <span>Lifetime value</span>
-        <span>10 days</span>
-      </div>
+        <h2>Indicators</h2>
+        <div>
+            <span>Number of deals</span>
+            <span id="nbDeals">0</span>
+        </div>
+        <div>
+            <span>Number of sales</span>
+            <span id="nbSales">0</span>
+        </div>
+        <div>
+            <span>average sales price value</span>
+            <span>0</span>
+        </div>
+        <div>
+            <span>p5 sales price value</span>
+            <span>0</span>
+        </div>
+        <div>
+            <span>p25 sales price value</span>
+            <span>0</span>
+        </div>
+        <div>
+            <span>p50 sales price value</span>
+            <span>0</span>
+        </div>
+        <div>
+            <span>Lifetime value</span>
+            <span>10 days</span>
+        </div>
     </section>
     <section id="deals"></section>
     <script type="text/javascript" charset="UTF-8" src="utils.js"></script>
     <script type="text/javascript" charset="UTF-8" src="portfolio.js"></script>
-  </body>
+</body>
 </html>
