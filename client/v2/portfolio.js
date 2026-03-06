@@ -29,6 +29,7 @@ let currentPagination = {};
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
 const selectLegoSetIds = document.querySelector('#lego-set-id-select');
+const sectionSales = document.querySelector('#sales');
 const sectionDeals= document.querySelector('#deals');
 const spanNbDeals = document.querySelector('#nbDeals');
 
@@ -72,17 +73,21 @@ const fetchDeals = async (page = 1, size = 6) => {
  * @param  {Array} deals
  */
 const renderDeals = deals => {
+  const favorites = getFavorites();
   const fragment = document.createDocumentFragment();
   const div = document.createElement('div');
   const template = deals
     .map(deal => {
+      const isFavorite = favorites.includes(deal.uuid);
+      const star = isFavorite ? "*" : ".";
       return `
       <div class="deal" id=${deal.uuid}>
         <span>${deal.id}</span>
-        <a href="${deal.link}">${deal.title}</a>
+        <a href="${deal.link}" target="_blank">${deal.title}</a>  
         <span>${deal.price}</span>
+        <button class="favorite-btn" data-id="${deal.uuid}">${star}</button>
       </div>
-    `;
+    `; // target="_blank" pour ouvrir le lien dans un nouvel onglet
     })
     .join('');
 
@@ -91,6 +96,33 @@ const renderDeals = deals => {
   sectionDeals.innerHTML = '<h2>Deals</h2>';
   sectionDeals.appendChild(fragment);
 };
+// functions for favorite button
+const getFavorites = () => {
+    const fav = localStorage.getItem('favorites');
+    return fav ? JSON.parse(fav) : [];
+};
+
+const saveFavorites = (favorites) => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+};
+
+sectionDeals.addEventListener('click', (event) => {
+    if (!event.target.classList.contains('favorite-btn')) return;
+
+    const dealId = event.target.dataset.id;
+    let favorites = getFavorites();
+
+    if (favorites.includes(dealId)) {
+        favorites = favorites.filter(id => id !== dealId);
+        event.target.textContent = ".";
+    } else {
+        favorites.push(dealId);
+        event.target.textContent = "*";
+    }
+
+    saveFavorites(favorites);
+});
+
 
 /**
  * Render page selector
@@ -198,6 +230,17 @@ const applyFilter = function (deals) {
         return filtered;
     }
 
+    if (activeFilter == 'favorites') {
+        var favorites = getFavorites();
+        var filtered = [];
+        for (var i = 0; i < deals.length; i++) {
+            if (favorites.indexOf(deals[i].uuid) !== -1) {
+                filtered.push(deals[i]);
+            }
+        }
+        return filtered;
+    }
+
     return deals;
 };
 
@@ -219,6 +262,11 @@ filterContainer.addEventListener('click', (event) => {
     if (text === 'By hot deals') {
         if (activeFilter == 'hot') { activeFilter = null; }
         else { activeFilter = 'hot'; }
+    }
+
+    if (text === 'By favorites') {
+        if (activeFilter == 'favorites') { activeFilter = null; }
+        else { activeFilter = 'favorites'; }
     }
 
     render(currentDeals, currentPagination);
@@ -355,6 +403,44 @@ selectLegoSetIds.addEventListener('change', async (event) => {
     const id = event.target.value;
 
     const salesData = await fetchSales(id);
-    renderSales(salesData);
+
+    renderSales(salesData);      // indicators
+    renderSalesList(salesData);  // list of sales
 });
+
+
+
+
+const renderSalesList = (sales) => {
+
+    if (!sales || sales.length === 0) {
+        sectionSales.innerHTML = `
+            <h2>Vinted sales</h2>
+            <p>No sales found</p>
+        `;
+        return;
+    }
+
+    const template = sales.map(sale => {
+        return `
+            <div class="sale">
+                <span>${new Date(sale.published * 1000).toLocaleDateString()}</span>
+                <a href="${sale.link}" target="_blank">${sale.title}</a>
+                <span>${sale.price.amount} $</span>
+            </div>
+        `;
+    }).join('');
+
+    sectionSales.innerHTML = `
+        <h2>Vinted sales</h2>
+        ${template}
+    `;
+};
+
+
+
+
+
+
+
 
