@@ -2,12 +2,12 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>🧱 Lego | Predictability of a lego set deal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lego | Predictability of a lego set deal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
     <style>
-        /* ── RESET ──────────────────────────────────────────── */
         *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
@@ -15,464 +15,1042 @@
         }
 
         :root {
-            --yellow: #FFD700;
-            --yellow-d: #C9A800;
-            --red: #E3000B;
-            --black: #111111;
-            --white: #FAFAF8;
-            --surface: #F3F2EE;
-            --border: #E2E0D8;
-            --muted: #8A8880;
-            --text: #1C1B19;
-            --radius: 8px;
-            --shadow: 0 1px 4px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+            --ink-900: #111827;
+            --ink-700: #374151;
+            --ink-500: #6b7280;
+            --surface-100: #f3f4f6;
+            --surface-50: #f9fafb;
+            --white: #ffffff;
+            --line: #e5e7eb;
+            --yellow: #ffcc00;
+            --yellow-deep: #f0b100;
+            --blue: #146eb4;
+            --orange: #ff9900;
+            --green: #15803d;
+            --danger: #dc2626;
+            --radius: 12px;
+            --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
         }
 
         body {
             font-family: 'DM Sans', sans-serif;
-            background: var(--surface);
-            color: var(--text);
+            color: var(--ink-900);
+            background: radial-gradient(circle at top right, #fff9db 0%, #f6f7fb 40%, #eef2f7 100%);
             min-height: 100vh;
         }
 
-        /* ── PAGE HEADING ───────────────────────────────────── */
+        .topbar {
+            background: linear-gradient(135deg, #131921 0%, #232f3e 100%);
+            color: var(--white);
+            padding: 1rem 1.2rem;
+            border-bottom: 4px solid var(--orange);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+        }
+
+        .topbar-inner {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
         h1 {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.6rem;
-            letter-spacing: .08em;
-            background: var(--black);
+            letter-spacing: 0.08em;
+            font-size: 2.2rem;
+            line-height: 1;
             color: var(--yellow);
-            padding: 1.2rem 2rem;
-            border-bottom: 4px solid var(--yellow);
+        }
+
+        .market-subtitle {
+            color: #d1d5db;
+            font-size: 0.85rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        #options {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--white);
+            border-bottom: 1px solid var(--line);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+            padding: 0.9rem 1.2rem;
+        }
+
+        .options-inner {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem 1.2rem;
+            align-items: center;
+        }
+
+        #options > .options-inner > div {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        #options label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--ink-500);
+        }
+
+        select {
+            appearance: none;
+            background-color: var(--surface-50);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7280'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.6rem center;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 0.42rem 1.8rem 0.42rem 0.6rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.86rem;
+            color: var(--ink-900);
+            cursor: pointer;
+        }
+
+        select:hover,
+        select:focus {
+            border-color: var(--blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(20, 110, 180, 0.15);
+        }
+
+        #filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            position: relative;
+        }
+
+        .filter-group {
+            display: inline-flex;
+            align-items: stretch;
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid #d1d5db;
+            background: #f8fafc;
+        }
+
+        .filter-main-btn,
+        .filter-arrow-btn,
+        .filter-btn {
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--ink-700);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            transition: all 0.15s;
+            user-select: none;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .filter-main-btn {
+            padding: 0.36rem 0.65rem 0.36rem 0.78rem;
+        }
+
+        .filter-arrow-btn {
+            padding: 0.36rem 0.52rem 0.36rem 0.4rem;
+            border-left: 1px solid #d1d5db;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        .filter-btn {
+            padding: 0.36rem 0.78rem;
+            border-radius: 999px;
+            border: 1px solid #d1d5db;
+            background: #f8fafc;
+        }
+
+        .filter-group:hover,
+        .filter-btn:hover {
+            border-color: var(--blue);
+            background: #eff6ff;
+        }
+
+        .filter-main-btn:hover,
+        .filter-arrow-btn:hover,
+        .filter-btn:hover {
+            color: var(--blue);
+        }
+
+        .filter-group.active,
+        .filter-btn.active {
+            background: var(--blue);
+            border-color: var(--blue);
+        }
+
+        .filter-group.active .filter-main-btn,
+        .filter-group.active .filter-arrow-btn,
+        .filter-btn.active {
+            color: var(--white);
+        }
+
+        .filter-group.active .filter-arrow-btn {
+            border-left-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .filter-threshold-popover {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 260px;
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 0.65rem;
+            display: none;
+            z-index: 60;
+        }
+
+        .filter-threshold-popover.visible {
+            display: grid;
+            gap: 0.45rem;
+        }
+
+        .filter-threshold-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+        }
+
+        .filter-threshold-title {
+            font-size: 0.75rem;
+            color: var(--ink-700);
+            font-weight: 700;
+        }
+
+        .filter-threshold-value {
+            font-size: 0.8rem;
+            color: var(--blue);
+            font-weight: 700;
+        }
+
+        #filter-threshold-range {
+            width: 100%;
+            accent-color: var(--blue);
+        }
+
+        .page-shell {
+            max-width: min(1700px, 98vw);
+            margin: 1rem auto 2rem;
+            padding: 0 1.2rem;
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: minmax(220px, 18vw) minmax(0, 1fr) minmax(260px, 21vw);
+            align-items: start;
+        }
+
+        .left-column,
+        .selector-column {
+            position: sticky;
+            top: 84px;
+            max-height: calc(100vh - 96px);
+            overflow-y: auto;
+            padding-right: 0.2rem;
+            display: grid;
+            gap: 1rem;
+            align-content: start;
+        }
+
+        .left-column {
+            grid-column: 1;
+        }
+
+        .main-column {
+            grid-column: 2;
+        }
+
+        .selector-column {
+            grid-column: 3;
+        }
+
+        .panel {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1rem;
         }
 
         h2 {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1rem;
-            letter-spacing: .1em;
-            color: var(--muted);
-            margin-bottom: .75rem;
+            font-size: 1.05rem;
+            letter-spacing: 0.1em;
+            color: var(--ink-700);
+            margin-bottom: 0.75rem;
         }
 
-        /* ── OPTIONS BAR ────────────────────────────────────── */
-        #options {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: .6rem 1.2rem;
-            padding: .85rem 2rem;
-            background: var(--white);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: 0 2px 8px rgba(0,0,0,.05);
-        }
-
-            #options > div {
-                display: flex;
-                align-items: center;
-                gap: .45rem;
-            }
-
-            #options label {
-                font-size: .7rem;
-                font-weight: 600;
-                letter-spacing: .1em;
-                text-transform: uppercase;
-                color: var(--muted);
-            }
-
-        select {
-            appearance: none;
-            background-color: var(--surface);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A8880'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right .65rem center;
-            border: 1.5px solid var(--border);
-            border-radius: 6px;
-            padding: .38rem 1.9rem .38rem .65rem;
-            font-family: 'DM Sans', sans-serif;
-            font-size: .82rem;
-            color: var(--text);
-            cursor: pointer;
-            transition: border-color .15s, box-shadow .15s;
-        }
-
-            select:hover, select:focus {
-                border-color: var(--yellow-d);
-                outline: none;
-                box-shadow: 0 0 0 3px rgba(255,215,0,.2);
-            }
-
-        /* ── FILTER PILLS ───────────────────────────────────── */
-        #filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: .4rem;
-        }
-
-            #filters span {
-                cursor: pointer;
-                font-size: .73rem;
-                font-weight: 600;
-                letter-spacing: .04em;
-                padding: .28rem .75rem;
-                border-radius: 99px;
-                border: 1.5px solid var(--border);
-                background: var(--surface);
-                color: var(--muted);
-                transition: all .15s;
-                user-select: none;
-            }
-
-                #filters span:hover {
-                    border-color: var(--yellow-d);
-                    color: var(--text);
-                    background: #FFFBE6;
-                }
-
-        /* ── LEGO SECTION ───────────────────────────────────── */
-        #lego {
-            padding: 1.25rem 2rem;
-            background: var(--white);
-            border-bottom: 1px solid var(--border);
-        }
-
-            #lego > div {
-                display: flex;
-                align-items: center;
-                gap: .55rem;
-            }
-
-                #lego > div > label {
-                    font-size: .7rem;
-                    font-weight: 600;
-                    letter-spacing: .1em;
-                    text-transform: uppercase;
-                    color: var(--muted);
-                }
-
-        /* ── DEALS SECTION ──────────────────────────────────── */
-        #deals {
-            padding: 1.5rem 2rem;
-        }
-
-            /* The div JS injects all .deal cards into */
-            #deals > div {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-                gap: 1rem;
-            }
-
-            /* Section heading injected by renderDeals */
-            #deals > h2 {
-                margin-bottom: .75rem;
-            }
-
-        .deal {
-            background: var(--white);
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius);
-            padding: .9rem 1rem;
+        #lego > div {
             display: flex;
             flex-direction: column;
-            gap: .4rem;
-            transition: box-shadow .15s, transform .15s, border-color .15s;
-            animation: fadeUp .3s ease both;
+            gap: 0.55rem;
         }
 
-            .deal:hover {
-                box-shadow: var(--shadow);
-                transform: translateY(-2px);
-                border-color: var(--yellow);
-            }
-
-            /* id span */
-            .deal > span:first-child {
-                font-size: .65rem;
-                font-weight: 700;
-                letter-spacing: .1em;
-                text-transform: uppercase;
-                color: var(--muted);
-            }
-
-            /* title link */
-            .deal > a {
-                font-size: .88rem;
-                font-weight: 500;
-                color: var(--text);
-                text-decoration: none;
-                line-height: 1.4;
-                flex: 1;
-            }
-
-                .deal > a:hover {
-                    color: var(--red);
-                    text-decoration: underline;
-                }
-
-            /* price span */
-            .deal > span:nth-child(3) {
-                font-family: 'Bebas Neue', sans-serif;
-                font-size: 1.35rem;
-                letter-spacing: .03em;
-                color: var(--black);
-                margin-top: auto;
-            }
-
-        /* favorite button */
-        .favorite-btn {
-            align-self: flex-end;
-            background: none;
-            border: 1.5px solid var(--border);
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            cursor: pointer;
-            font-size: .9rem;
-            line-height: 1;
-            transition: all .15s;
-            color: var(--muted);
-            padding: 0;
+        .lego-select-row {
+            position: relative;
+            display: block;
         }
 
-            .favorite-btn:hover {
-                border-color: var(--yellow-d);
-                color: var(--yellow-d);
-                background: #FFFBE6;
-            }
+        .lego-native-hidden {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            width: 1px;
+            height: 1px;
+        }
 
-        /* ── SALES SECTION ──────────────────────────────────── */
-        #sales {
-            padding: 1.25rem 2rem;
+        .lego-dropdown {
+            position: relative;
+        }
+
+        .lego-dropdown-btn {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 9px;
             background: var(--white);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
+            padding: 0.42rem 0.6rem;
+            display: grid;
+            grid-template-columns: 36px 1fr 18px;
+            gap: 0.5rem;
+            align-items: center;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .lego-dropdown-btn:hover,
+        .lego-dropdown-btn:focus {
+            border-color: var(--blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(20, 110, 180, 0.15);
+        }
+
+        .lego-dropdown-btn img {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+
+        .lego-dropdown-text {
+            font-size: 0.86rem;
+            color: var(--ink-900);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .lego-dropdown-caret {
+            text-align: right;
+            color: var(--ink-500);
+            font-size: 0.78rem;
+        }
+
+        .lego-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            max-height: 270px;
+            overflow-y: auto;
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 0.35rem;
+            display: none;
+            z-index: 30;
+        }
+
+        .lego-dropdown.open .lego-dropdown-menu {
+            display: grid;
+            gap: 0.3rem;
+        }
+
+        .lego-dropdown-item {
+            width: 100%;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            background: var(--white);
+            padding: 0.35rem;
+            display: grid;
+            grid-template-columns: 32px 1fr;
+            gap: 0.45rem;
+            align-items: center;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .lego-dropdown-item:hover {
+            background: #f8fafc;
+            border-color: #dbeafe;
+        }
+
+        .lego-dropdown-item.active {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .lego-dropdown-item img {
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: #f1f5f9;
+        }
+
+        .lego-dropdown-item span {
+            font-size: 0.82rem;
+            color: var(--ink-900);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #selected-set {
+            margin-top: 0.9rem;
+            display: none;
+        }
+
+        #selected-set.visible {
+            display: block;
+        }
+
+        .selected-card {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--surface-50);
+        }
+
+        .selected-image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            background: #f1f5f9;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .selected-content {
+            padding: 0.8rem;
+            display: grid;
+            gap: 0.3rem;
+        }
+
+        .selected-id {
+            font-size: 0.72rem;
+            color: var(--ink-500);
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .selected-title {
+            font-size: 0.88rem;
+            color: var(--ink-900);
+            line-height: 1.35;
+        }
+
+        .selected-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.35rem;
+            gap: 0.5rem;
+        }
+
+        .selected-price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.45rem;
+            color: var(--green);
+            letter-spacing: 0.03em;
+        }
+
+        .selected-link {
+            text-decoration: none;
+            background: var(--orange);
+            color: #1f2937;
+            padding: 0.36rem 0.56rem;
+            border-radius: 7px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        #indicators {
+            padding: 1rem;
+        }
+
+        #indicators > div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.52rem 0;
+            border-bottom: 1px dashed #d8dee9;
+        }
+
+        #indicators > div:last-child {
+            border-bottom: none;
+        }
+
+        #indicators > div > span:first-child {
+            font-size: 0.8rem;
+            color: var(--ink-500);
+        }
+
+        #indicators > div > span:last-child {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--ink-900);
+        }
+
+        .main-column {
+            display: grid;
+            gap: 1rem;
+        }
+
+        #deals {
+            padding: 1rem;
+        }
+
+        #deals > div {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 0.95rem;
+        }
+
+        .deal {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            overflow: hidden;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            background: var(--white);
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            animation: cardIn 0.3s ease both;
+        }
+
+        .deal.favorite-deal {
+            background: #fff7cc;
+            border-color: #f4ce58;
+        }
+
+        .deal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e1;
+        }
+
+        .deal-media {
+            display: block;
+            position: relative;
+            background: #f1f5f9;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .deal-media img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            display: block;
+        }
+
+        .deal-source {
+            position: absolute;
+            top: 0.4rem;
+            left: 0.4rem;
+            background: rgba(19, 25, 33, 0.88);
+            color: var(--white);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.2rem 0.42rem;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .deal-body {
+            padding: 0.75rem;
+            display: grid;
+            gap: 0.45rem;
+        }
+
+        .deal-id {
+            font-size: 0.68rem;
+            color: var(--ink-500);
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .deal-title {
+            color: var(--ink-900);
+            text-decoration: none;
+            font-size: 0.86rem;
+            line-height: 1.35;
+            min-height: 2.7em;
+        }
+
+        .deal-title:hover {
+            color: var(--blue);
+            text-decoration: underline;
+        }
+
+        .deal-footer {
+            margin-top: 0.15rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .deal-price {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0.03em;
+            font-size: 1.45rem;
+            color: var(--green);
+        }
+
+        .favorite-btn {
+            background: #fff8e8;
+            border: 1px solid #d1d5db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            color: var(--ink-500);
+            font-size: 0.92rem;
+            line-height: 1;
+            transition: all 0.15s;
+        }
+
+        .favorite-btn:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .favorite-btn.active {
+            color: #dc2626;
+            border-color: #fca5a5;
+            background: #fee2e2;
+        }
+
+        .deals-footer {
+            margin-top: 0.9rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+            justify-content: center;
+            border-top: 1px solid var(--line);
+            padding-top: 0.75rem;
+        }
+
+        .deals-pagination {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .deals-btn {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: var(--white);
+            color: var(--ink-700);
+            padding: 0.45rem 0.7rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.15s;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .deals-btn:hover:not(:disabled) {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: #eff6ff;
+        }
+
+        .deals-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .deals-page-info {
+            font-size: 0.8rem;
+            color: var(--ink-500);
+            font-weight: 700;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .show-more-card {
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            background: #f8fafc;
+            min-height: 100%;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 0.8rem;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s, transform 0.15s;
+        }
+
+        .show-more-card:hover {
+            border-color: var(--blue);
+            background: #eff6ff;
+            transform: translateY(-2px);
+        }
+
+        .show-more-card strong {
+            font-size: 0.9rem;
+            color: var(--ink-900);
+            line-height: 1.3;
+        }
+
+        .show-more-card span {
+            font-size: 0.76rem;
+            color: var(--ink-500);
+            margin-top: 0.35rem;
+            display: block;
+        }
+
+        #sales {
+            padding: 1rem;
+        }
+
+        .sales-list {
+            display: grid;
+            gap: 0.62rem;
         }
 
         .sale {
-            display: flex;
-            align-items: baseline;
-            gap: .75rem;
-            padding: .55rem 0;
-            border-bottom: 1px solid var(--border);
-            font-size: .84rem;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #fcfcfd;
+            padding: 0.65rem;
+            display: grid;
+            grid-template-columns: 54px 1fr auto;
+            gap: 0.65rem;
+            align-items: center;
         }
 
-            .sale:last-child {
-                border-bottom: none;
-            }
-
-            .sale > span:first-child {
-                font-size: .7rem;
-                font-weight: 600;
-                color: var(--muted);
-                min-width: 68px;
-                white-space: nowrap;
-            }
-
-            .sale > a {
-                flex: 1;
-                color: var(--text);
-                text-decoration: none;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-                .sale > a:hover {
-                    color: var(--red);
-                }
-
-            .sale > span:last-child {
-                font-family: 'Bebas Neue', sans-serif;
-                font-size: 1rem;
-                white-space: nowrap;
-                color: var(--black);
-            }
-
-        /* ── INDICATORS SECTION ─────────────────────────────── */
-        #indicators {
-            padding: 1.25rem 2rem;
-            background: var(--white);
-            border-bottom: 1px solid var(--border);
+        .sale-logo {
+            width: 54px;
+            height: 54px;
+            object-fit: contain;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.2rem;
         }
 
-            #indicators > div {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: .55rem 0;
-                border-bottom: 1px solid var(--border);
-            }
+        .sale-main {
+            min-width: 0;
+            display: grid;
+            gap: 0.18rem;
+        }
 
-                #indicators > div:last-child {
-                    border-bottom: none;
-                }
+        .sale-main a {
+            color: var(--ink-900);
+            text-decoration: none;
+            font-size: 0.86rem;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
 
-                #indicators > div > span:first-child {
-                    font-size: .82rem;
-                    color: var(--muted);
-                    font-weight: 500;
-                }
+        .sale-main a:hover {
+            color: var(--blue);
+            text-decoration: underline;
+        }
 
-                #indicators > div > span:last-child {
-                    font-family: 'Bebas Neue', sans-serif;
-                    font-size: 1.1rem;
-                    letter-spacing: .04em;
-                    color: var(--text);
-                }
+        .sale-date {
+            font-size: 0.72rem;
+            color: var(--ink-500);
+            font-weight: 600;
+        }
 
-        /* ── ANIMATIONS ─────────────────────────────────────── */
-        @keyframes fadeUp {
+        .sale-price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            color: var(--ink-900);
+            white-space: nowrap;
+        }
+
+        .muted-state {
+            font-size: 0.86rem;
+            color: var(--ink-500);
+        }
+
+        @keyframes cardIn {
             from {
                 opacity: 0;
                 transform: translateY(8px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        .deal:nth-child(1) {
-            animation-delay: .04s
+        @media (max-width: 1380px) {
+            #deals > div {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
         }
 
-        .deal:nth-child(2) {
-            animation-delay: .08s
+        @media (max-width: 1180px) {
+            .page-shell {
+                grid-template-columns: minmax(220px, 32vw) 1fr;
+            }
+
+            .selector-column {
+                grid-column: 1;
+                position: static;
+                max-height: none;
+                overflow: visible;
+                padding-right: 0;
+            }
+
+            .main-column {
+                grid-column: 2;
+                grid-row: 1 / span 2;
+            }
+
+            #deals > div {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
         }
 
-        .deal:nth-child(3) {
-            animation-delay: .12s
+        @media (max-width: 980px) {
+            .page-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .left-column,
+            .selector-column {
+                position: static;
+                max-height: none;
+                overflow: visible;
+                padding-right: 0;
+            }
+
+            .left-column,
+            .main-column,
+            .selector-column {
+                grid-column: auto;
+            }
+
+            #options {
+                position: static;
+            }
+
+            .selector-column {
+                order: -1;
+            }
+
+            #deals > div {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
         }
 
-        .deal:nth-child(4) {
-            animation-delay: .16s
+        @media (max-width: 650px) {
+            .topbar-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            h1 {
+                font-size: 1.95rem;
+            }
+
+            .sale {
+                grid-template-columns: 44px 1fr;
+            }
+
+            .sale-price {
+                grid-column: 2;
+                justify-self: start;
+            }
+
+            .sale-logo {
+                width: 44px;
+                height: 44px;
+            }
+
+            #deals > div {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
 
-        .deal:nth-child(5) {
-            animation-delay: .20s
+        @media (max-width: 460px) {
+            #deals > div {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .deal:nth-child(6) {
-            animation-delay: .24s
-        }
-
-        .deal:nth-child(7) {
-            animation-delay: .28s
-        }
-
-        .deal:nth-child(8) {
-            animation-delay: .32s
-        }
-
-        .deal:nth-child(9) {
-            animation-delay: .36s
-        }
-
-        .deal:nth-child(10) {
-            animation-delay: .40s
-        }
-
-        .deal:nth-child(11) {
-            animation-delay: .44s
-        }
-
-        .deal:nth-child(12) {
-            animation-delay: .48s
-        }
-
-        /* ── SCROLLBAR ──────────────────────────────────────── */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--surface);
+            background: #eef2f7;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
+            background: #cbd5e1;
+            border-radius: 999px;
         }
     </style>
 </head>
 <body>
-    <h1>Lego</h1>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <h1>Lego Market</h1>
+            <p class="market-subtitle">Dealabs deals + Vinted market signals</p>
+        </div>
+    </header>
+
     <section id="options">
-        <div id="show">
-            <label for="show-select">Show:</label>
-            <select name="show" id="show-select">
-                <option value="6">6</option>
-                <option value="12">12</option>
-                <option value="24">24</option>
-            </select>
-        </div>
-        <div id="page">
-            <label for="page-select">Go to page:</label>
-            <select name="page" id="page-select"> </select>
-        </div>
-        <div id="filters">
-            <span>By best discount</span>
-            <span>By most commented</span>
-            <span>By hot deals</span>
-            <span>By favorites</span>
-        </div>
-        <div id="sort">
-            <label for="sort-select">Sort:</label>
-            <select name="sort" id="sort-select">
-                <option value="price-asc">Cheaper</option>
-                <option value="price-desc">Expensive</option>
-                <option value="date-asc">Recently published</option>
-                <option value="date-desc">Anciently published</option>
-            </select>
-        </div>
-    </section>
-    <section id="lego">
-        <h2>Lego sets</h2>
-        <div>
-            <label>Lego set id:</label>
-            <select id="lego-set-id-select"></select>
-        </div>
-    </section>
-    <section id="sales">
-        <h2>Vinted sales</h2>
-    </section>
-    <section id="indicators">
-        <h2>Indicators</h2>
-        <div>
-            <span>Number of deals</span>
-            <span id="nbDeals">0</span>
-        </div>
-        <div>
-            <span>Number of sales</span>
-            <span id="nbSales">0</span>
-        </div>
-        <div>
-            <span>average sales price value</span>
-            <span>0</span>
-        </div>
-        <div>
-            <span>p5 sales price value</span>
-            <span>0</span>
-        </div>
-        <div>
-            <span>p25 sales price value</span>
-            <span>0</span>
-        </div>
-        <div>
-            <span>p50 sales price value</span>
-            <span>0</span>
-        </div>
-        <div>
-            <span>Lifetime value</span>
-            <span>10 days</span>
+        <div class="options-inner">
+            <div id="show">
+                <label for="show-select">Show</label>
+                <select name="show" id="show-select">
+                    <option value="6">6</option>
+                    <option value="12">12</option>
+                    <option value="24">24</option>
+                </select>
+            </div>
+            <div id="page">
+                <label for="page-select">Page</label>
+                <select name="page" id="page-select"></select>
+            </div>
+            <div id="sort">
+                <label for="sort-select">Sort</label>
+                <select name="sort" id="sort-select">
+                    <option value="default">Default</option>
+                    <option value="price-asc">Cheaper</option>
+                    <option value="price-desc">Expensive</option>
+                    <option value="date-asc">Recently published</option>
+                    <option value="date-desc">Anciently published</option>
+                </select>
+            </div>
+            <div id="filters">
+                <div class="filter-group" data-filter="discount">
+                    <button type="button" class="filter-main-btn" data-filter="discount" data-role="toggle">By best discount</button>
+                    <button type="button" class="filter-arrow-btn" data-filter="discount" data-role="threshold" aria-label="Set discount threshold">&#9662;</button>
+                </div>
+                <div class="filter-group" data-filter="commented">
+                    <button type="button" class="filter-main-btn" data-filter="commented" data-role="toggle">By most commented</button>
+                    <button type="button" class="filter-arrow-btn" data-filter="commented" data-role="threshold" aria-label="Set comments threshold">&#9662;</button>
+                </div>
+                <div class="filter-group" data-filter="hot">
+                    <button type="button" class="filter-main-btn" data-filter="hot" data-role="toggle">By hot deals</button>
+                    <button type="button" class="filter-arrow-btn" data-filter="hot" data-role="threshold" aria-label="Set hot threshold">&#9662;</button>
+                </div>
+                <button type="button" class="filter-btn" data-filter="favorites" data-role="toggle">By favorites</button>
+                <div id="filter-threshold-popover" class="filter-threshold-popover">
+                    <div class="filter-threshold-top">
+                        <span id="filter-threshold-title" class="filter-threshold-title">Threshold</span>
+                        <span id="filter-threshold-value" class="filter-threshold-value">0</span>
+                    </div>
+                    <input id="filter-threshold-range" type="range" min="0" max="100" step="1" value="50" />
+                </div>
+            </div>
         </div>
     </section>
-    <section id="deals"></section>
+
+    <main class="page-shell">
+        <aside class="left-column">
+            <section id="indicators" class="panel">
+                <h2>Indicators</h2>
+                <div>
+                    <span>Number of deals</span>
+                    <span id="nbDeals">0</span>
+                </div>
+                <div>
+                    <span>Number of sales</span>
+                    <span id="nbSales">0</span>
+                </div>
+                <div>
+                    <span>Average sales price</span>
+                    <span id="avgSalesValue">0</span>
+                </div>
+                <div>
+                    <span>P5 sales price</span>
+                    <span id="p5SalesValue">0</span>
+                </div>
+                <div>
+                    <span>P25 sales price</span>
+                    <span id="p25SalesValue">0</span>
+                </div>
+                <div>
+                    <span>P50 sales price</span>
+                    <span id="p50SalesValue">0</span>
+                </div>
+                <div>
+                    <span>Lifetime value</span>
+                    <span id="lifetimeSalesValue">0 days</span>
+                </div>
+            </section>
+        </aside>
+
+        <section class="main-column">
+            <section id="deals" class="panel"></section>
+            <section id="sales" class="panel">
+                <h2>Vinted sales</h2>
+                <p class="muted-state">Choose a Lego set id to load Vinted sales.</p>
+            </section>
+        </section>
+
+        <aside class="selector-column">
+            <section id="lego" class="panel">
+                <h2>Lego Set Selector</h2>
+                <div>
+                    <label for="lego-set-id-select">Lego set id</label>
+                    <div class="lego-select-row">
+                        <select id="lego-set-id-select" class="lego-native-hidden"></select>
+                        <div id="lego-set-dropdown" class="lego-dropdown">
+                            <button id="lego-set-dropdown-btn" class="lego-dropdown-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                                <img id="lego-set-dropdown-image" alt="Selected lego set" />
+                                <span id="lego-set-dropdown-text" class="lego-dropdown-text">Select a lego set</span>
+                                <span class="lego-dropdown-caret">&#9662;</span>
+                            </button>
+                            <div id="lego-set-dropdown-menu" class="lego-dropdown-menu" role="listbox" aria-label="Lego sets"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="selected-set">
+                    <h2>Selected Set</h2>
+                    <div id="selected-set-preview"></div>
+                </div>
+            </section>
+        </aside>
+    </main>
+
     <script type="text/javascript" charset="UTF-8" src="utils.js"></script>
     <script type="text/javascript" charset="UTF-8" src="portfolio.js"></script>
 </body>
