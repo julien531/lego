@@ -79,8 +79,31 @@ const toNumber = value => {
 
 const formatPrice = (amount, currency) => {
   const value = toNumber(amount);
-  const symbol = currency === 'EUR' ? 'EUR' : '$';
+  const symbol = currency === 'EUR' ? '€' : '$';
   return `${value.toFixed(2)} ${symbol}`;
+};
+
+const calculateOriginalPrice = (salePrice, discount) => {
+  const price = toNumber(salePrice);
+  const disc = toNumber(discount);
+  if (disc >= 100 || disc <= 0) return price;
+  return price / (1 - disc / 100);
+};
+
+const getTemperatureColor = (temperature) => {
+  const temp = toNumber(temperature);
+  if (temp >= 200) return '#ff6b35';
+  if (temp >= 100) return '#f7931e';
+  if (temp >= 50) return '#ffd166';
+  return '#cbd5e1';
+};
+
+const getTemperatureEmoji = (temperature) => {
+  const temp = toNumber(temperature);
+  if (temp >= 200) return '🔥';
+  if (temp >= 100) return '⚡';
+  if (temp >= 50) return '🌡️';
+  return '❄️';
 };
 
 const getDealImage = deal => {
@@ -195,18 +218,27 @@ const renderDeals = deals => {
       const star = isFavorite ? '❤' : '♡';
       const image = getDealImage(deal);
       const source = deal.community || 'dealabs';
+      const discount = toNumber(deal.discount);
+      const originalPrice = calculateOriginalPrice(deal.price, discount);
+      const temperature = toNumber(deal.temperature);
 
       return `
         <article class="deal ${isFavorite ? 'favorite-deal' : ''}" id="${deal.uuid}">
           <a class="deal-media" href="${deal.link}" target="_blank" rel="noopener noreferrer">
             <img src="${image}" alt="${deal.title}" loading="lazy" />
             <span class="deal-source">${source}</span>
+            <span class="deal-temperature" style="background-color: ${getTemperatureColor(temperature)}" title="Hotness score: ${temperature}">${getTemperatureEmoji(temperature)} ${temperature}</span>
           </a>
           <div class="deal-body">
             <span class="deal-id">Set #${deal.id}</span>
             <a class="deal-title" href="${deal.link}" target="_blank" rel="noopener noreferrer">${deal.title}</a>
-            <div class="deal-footer">
+            <div class="deal-prices">
+              <span class="deal-original-price">${formatPrice(originalPrice)}</span>
               <span class="deal-price">${formatPrice(deal.price)}</span>
+              <span class="deal-discount">-${discount}%</span>
+            </div>
+            <div class="deal-footer">
+              <span class="deal-comments" title="Comments: ${deal.comments}">💬 ${deal.comments}</span>
               <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${deal.uuid}" aria-label="Toggle favorite">${star}</button>
             </div>
           </div>
@@ -359,6 +391,32 @@ const handleLegoSetSelection = async (id, shouldScroll = true) => {
 const renderIndicators = pagination => {
   const {count} = pagination;
   spanNbDeals.textContent = count;
+
+  if (!currentDeals || currentDeals.length === 0) return;
+
+  const discounts = currentDeals
+    .map(deal => toNumber(deal.discount))
+    .filter(d => Number.isFinite(d));
+  
+  const temperatures = currentDeals
+    .map(deal => toNumber(deal.temperature))
+    .filter(t => Number.isFinite(t));
+  
+  const avgDiscount = discounts.length > 0 ? discounts.reduce((a, b) => a + b, 0) / discounts.length : 0;
+  const maxDiscount = discounts.length > 0 ? Math.max(...discounts) : 0;
+  const avgTemp = temperatures.length > 0 ? temperatures.reduce((a, b) => a + b, 0) / temperatures.length : 0;
+  const maxTemp = temperatures.length > 0 ? Math.max(...temperatures) : 0;
+  
+  // Update additional indicator spans
+  const spanAvgDiscount = document.querySelector('#avgDiscountValue');
+  const spanMaxDiscount = document.querySelector('#maxDiscountValue');
+  const spanAvgTemp = document.querySelector('#avgTempValue');
+  const spanMaxTemp = document.querySelector('#maxTempValue');
+  
+  if (spanAvgDiscount) spanAvgDiscount.textContent = `${avgDiscount.toFixed(1)}%`;
+  if (spanMaxDiscount) spanMaxDiscount.textContent = `${maxDiscount}%`;
+  if (spanAvgTemp) spanAvgTemp.textContent = `${avgTemp.toFixed(0)}`;
+  if (spanMaxTemp) spanMaxTemp.textContent = `${maxTemp}`;
 };
 
 const renderSelectedSet = deal => {
@@ -369,14 +427,23 @@ const renderSelectedSet = deal => {
   }
 
   const image = getDealImage(deal);
+  const discount = toNumber(deal.discount);
+  const originalPrice = calculateOriginalPrice(deal.price, discount);
+  const temperature = toNumber(deal.temperature);
+  const tempEmoji = getTemperatureEmoji(temperature);
+  
   selectedSetPreview.innerHTML = `
     <article class="selected-card">
       <img class="selected-image" src="${image}" alt="${deal.title}" loading="lazy" />
       <div class="selected-content">
         <span class="selected-id">Set #${deal.id}</span>
         <p class="selected-title">${deal.title}</p>
-        <div class="selected-meta">
+        <div class="selected-prices">
+          <span class="selected-original-price">${formatPrice(originalPrice)}</span>
           <span class="selected-price">${formatPrice(deal.price)}</span>
+        </div>
+        <div class="selected-meta">
+          <span class="selected-hotness" style="color: ${getTemperatureColor(temperature)}">${tempEmoji} ${temperature}</span>
           <a class="selected-link" href="${deal.link}" target="_blank" rel="noopener noreferrer">Open deal</a>
         </div>
       </div>
@@ -436,10 +503,23 @@ const renderSalesList = sales => {
     return;
   }
 
+  const selectedDealId = selectLegoSetIds.value;
+  const selectedDeal = getDealById(currentDeals, selectedDealId);
+  const dealabsPrice = selectedDeal ? toNumber(selectedDeal.price) : null;
+
   const template = sales
     .map(sale => {
       const date = new Date(toNumber(sale.published) * 1000).toLocaleDateString();
-      const priceLabel = formatPrice(sale.price.amount, sale.price.currency_code);
+      const vintedPrice = toNumber(sale.price.amount);
+      const salePrice = formatPrice(vintedPrice, sale.price.currency_code);
+      
+      let profitHTML = '';
+      if (dealabsPrice !== null && Number.isFinite(dealabsPrice)) {
+        const profit = vintedPrice - dealabsPrice;
+        const profitColor = profit >= 0 ? '#15803d' : '#dc2626';
+        const profitText = profit >= 0 ? `+${profit.toFixed(2)}` : `${profit.toFixed(2)}`;
+        profitHTML = `<span class="sale-profit" style="color: ${profitColor}">${profitText}</span>`;
+      }
 
       return `
         <article class="sale">
@@ -448,7 +528,10 @@ const renderSalesList = sales => {
             <a href="${sale.link}" target="_blank" rel="noopener noreferrer">${sale.title}</a>
             <span class="sale-date">${date}</span>
           </div>
-          <span class="sale-price">${priceLabel}</span>
+          <div class="sale-pricing">
+            <span class="sale-price">${salePrice}</span>
+            ${profitHTML}
+          </div>
         </article>
       `;
     })
