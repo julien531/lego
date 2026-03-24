@@ -188,7 +188,7 @@ const renderLegoSetIds = deals => {
  * @param  {Object} pagination
  */
 const renderIndicators = pagination => {
-  const {count} = pagination;
+  const count = toNumber(pagination.count || pagination.total);
 
   spanNbDeals.innerHTML = count;
 };
@@ -200,6 +200,7 @@ const render = (deals, pagination) => {
   renderDeals(sortedDeals);
   renderPagination(pagination);
   renderIndicators(pagination);
+  updateDealIndicators(sortedDeals);
   renderLegoSetIds(deals);
 
   updateFilterButtonsState();
