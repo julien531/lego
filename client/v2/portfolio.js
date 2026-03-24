@@ -43,7 +43,7 @@ const filterThresholdConfig = {
 
 const FALLBACK_DEAL_IMAGE = 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=700&q=60';
 const VINTED_LOGO_IMAGE = 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Vinted_Logo.svg/320px-Vinted_Logo.svg.png';
-const API_BASE_URL = window.LEGO_API_URL || 'http://localhost:8092';
+const API_BASE_URL = window.LEGO_API_URL || 'https://server-flame-eta-87.vercel.app';
 
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
@@ -174,10 +174,7 @@ const setCurrentDeals = ({result, meta}) => {
  */
 const fetchDeals = async (page = 1, size = 6) => {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/deals?page=${page}&size=${size}`
-      `${API_BASE_URL}/deals?page=${page}&size=${size}`
-    );
+    const response = await fetch(`${API_BASE_URL}/deals?page=${page}&size=${size}`);
     const body = await response.json();
 
     if (body.success !== true) {

@@ -21,7 +21,6 @@ let SALES = {};
 app.use(bodyParser.json());
 app.use(cors());
 app.use(helmet());
-app.use(cors())
 
 app.get('/', (request, response) => {
   response.send({'ack': true});
@@ -289,6 +288,8 @@ try {
 export default app;
 
 // For local development
-app.listen(PORT, () => {
-  console.log(`📡 Running on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`📡 Running on port ${PORT}`);
+  });
+}
