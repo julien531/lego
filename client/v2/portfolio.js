@@ -43,6 +43,7 @@ const filterThresholdConfig = {
 
 const FALLBACK_DEAL_IMAGE = 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=700&q=60';
 const VINTED_LOGO_IMAGE = 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Vinted_Logo.svg/320px-Vinted_Logo.svg.png';
+const API_BASE_URL = window.LEGO_API_URL || 'http://localhost:8092';
 
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
@@ -90,6 +91,38 @@ const calculateOriginalPrice = (salePrice, discount) => {
   return price / (1 - disc / 100);
 };
 
+const getOriginalPrice = deal => {
+  const retail = toNumber(deal.retail);
+  const price = toNumber(deal.price);
+
+  if (retail > price) {
+    return retail;
+  }
+
+  return calculateOriginalPrice(price, deal.discount);
+};
+
+const getDiscountPercent = deal => {
+  const explicit = toNumber(deal.discount);
+  if (explicit > 0) {
+    return Math.round(explicit);
+  }
+
+  const price = toNumber(deal.price);
+  const original = getOriginalPrice(deal);
+
+  if (original > price && original > 0) {
+    return Math.round(((original - price) / original) * 100);
+  }
+
+  return 0;
+};
+
+const formatTemperature = temperature => {
+  const temp = toNumber(temperature);
+  return `${Math.round(temp)}°`;
+};
+
 const getTemperatureColor = (temperature) => {
   const temp = toNumber(temperature);
   if (temp >= 200) return '#ff6b35';
@@ -110,8 +143,17 @@ const getDealImage = deal => {
   return deal.photo || deal.image || deal.imageUrl || FALLBACK_DEAL_IMAGE;
 };
 
+const getSafeImageHtml = (src, alt, className = '') => {
+  const classAttr = className ? ` class="${className}"` : '';
+  return `<img${classAttr} src="${src}" alt="${alt}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_DEAL_IMAGE}';" />`;
+};
+
 const getDealById = (deals, id) => {
   return deals.find(deal => String(deal.id) === String(id));
+};
+
+const getSaleImage = sale => {
+  return sale?.photo || VINTED_LOGO_IMAGE;
 };
 
 /**
@@ -133,7 +175,7 @@ const setCurrentDeals = ({result, meta}) => {
 const fetchDeals = async (page = 1, size = 6) => {
   try {
     const response = await fetch(
-      `https://lego-api-blue.vercel.app/deals?page=${page}&size=${size}`
+      `${API_BASE_URL}/deals?page=${page}&size=${size}`
     );
     const body = await response.json();
 
@@ -156,7 +198,7 @@ const fetchDeals = async (page = 1, size = 6) => {
  */
 const fetchSales = async id => {
   try {
-    const response = await fetch(`https://lego-api-blue.vercel.app/sales?id=${id}`);
+    const response = await fetch(`${API_BASE_URL}/sales?id=${id}`);
     const body = await response.json();
 
     if (body.success !== true) {
@@ -217,17 +259,27 @@ const renderDeals = deals => {
       const isFavorite = favorites.includes(deal.uuid);
       const star = isFavorite ? '❤' : '♡';
       const image = getDealImage(deal);
-      const source = deal.community || 'dealabs';
-      const discount = toNumber(deal.discount);
-      const originalPrice = calculateOriginalPrice(deal.price, discount);
+      const community = deal.community || 'dealabs';
+      const isDealabs = community === 'dealabs';
+      const sourceEmoji = community === 'avenuedelabrique' ? '🧱' : '🧪';
+      const sourceLabel = community === 'avenuedelabrique' ? 'Avenue de la Brique' : 'Dealabs';
+      const discount = getDiscountPercent(deal);
+      const originalPrice = getOriginalPrice(deal);
       const temperature = toNumber(deal.temperature);
+      const temperatureLabel = formatTemperature(temperature);
+      const temperatureBadge = isDealabs
+        ? `<span class="deal-temperature" style="background-color: ${getTemperatureColor(temperature)}" title="Chaleur Dealabs: ${temperatureLabel}">${getTemperatureEmoji(temperature)} ${temperatureLabel}</span>`
+        : '';
+      const commentsLabel = isDealabs
+        ? `<span class="deal-comments" title="Comments: ${deal.comments}">💬 ${deal.comments}</span>`
+        : '';
 
       return `
         <article class="deal ${isFavorite ? 'favorite-deal' : ''}" id="${deal.uuid}">
           <a class="deal-media" href="${deal.link}" target="_blank" rel="noopener noreferrer">
-            <img src="${image}" alt="${deal.title}" loading="lazy" />
-            <span class="deal-source">${source}</span>
-            <span class="deal-temperature" style="background-color: ${getTemperatureColor(temperature)}" title="Hotness score: ${temperature}">${getTemperatureEmoji(temperature)} ${temperature}</span>
+            ${getSafeImageHtml(image, deal.title)}
+            <span class="deal-source">${sourceEmoji} ${sourceLabel}</span>
+            ${temperatureBadge}
           </a>
           <div class="deal-body">
             <span class="deal-id">Set #${deal.id}</span>
@@ -238,7 +290,7 @@ const renderDeals = deals => {
               <span class="deal-discount">-${discount}%</span>
             </div>
             <div class="deal-footer">
-              <span class="deal-comments" title="Comments: ${deal.comments}">💬 ${deal.comments}</span>
+              ${commentsLabel}
               <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-id="${deal.uuid}" aria-label="Toggle favorite">${star}</button>
             </div>
           </div>
@@ -324,6 +376,10 @@ const setLegoDropdownSelection = deal => {
   }
 
   legoSetDropdownImage.src = getDealImage(deal);
+  legoSetDropdownImage.onerror = () => {
+    legoSetDropdownImage.onerror = null;
+    legoSetDropdownImage.src = FALLBACK_DEAL_IMAGE;
+  };
   legoSetDropdownText.textContent = `Set #${deal.id}`;
 
   if (legoSetDropdownMenu) {
@@ -346,7 +402,7 @@ const renderLegoDropdownMenu = deals => {
     .map(deal => {
       return `
         <button type="button" class="lego-dropdown-item" data-id="${deal.id}" role="option" aria-selected="false">
-          <img src="${getDealImage(deal)}" alt="Set ${deal.id}" loading="lazy" />
+          ${getSafeImageHtml(getDealImage(deal), `Set ${deal.id}`)}
           <span>Set #${deal.id}</span>
         </button>
       `;
@@ -394,11 +450,13 @@ const renderIndicators = pagination => {
 
   if (!currentDeals || currentDeals.length === 0) return;
 
+  const dealabsDeals = currentDeals.filter(deal => (deal.community || 'dealabs') === 'dealabs');
+
   const discounts = currentDeals
     .map(deal => toNumber(deal.discount))
     .filter(d => Number.isFinite(d));
   
-  const temperatures = currentDeals
+  const temperatures = dealabsDeals
     .map(deal => toNumber(deal.temperature))
     .filter(t => Number.isFinite(t));
   
@@ -427,14 +485,19 @@ const renderSelectedSet = deal => {
   }
 
   const image = getDealImage(deal);
-  const discount = toNumber(deal.discount);
-  const originalPrice = calculateOriginalPrice(deal.price, discount);
+  const community = deal.community || 'dealabs';
+  const isDealabs = community === 'dealabs';
+  const originalPrice = getOriginalPrice(deal);
   const temperature = toNumber(deal.temperature);
+  const temperatureLabel = formatTemperature(temperature);
   const tempEmoji = getTemperatureEmoji(temperature);
+  const selectedHotness = isDealabs
+    ? `<span class="selected-hotness" style="color: ${getTemperatureColor(temperature)}">${tempEmoji} ${temperatureLabel}</span>`
+    : '';
   
   selectedSetPreview.innerHTML = `
     <article class="selected-card">
-      <img class="selected-image" src="${image}" alt="${deal.title}" loading="lazy" />
+      ${getSafeImageHtml(image, deal.title, 'selected-image')}
       <div class="selected-content">
         <span class="selected-id">Set #${deal.id}</span>
         <p class="selected-title">${deal.title}</p>
@@ -443,7 +506,7 @@ const renderSelectedSet = deal => {
           <span class="selected-price">${formatPrice(deal.price)}</span>
         </div>
         <div class="selected-meta">
-          <span class="selected-hotness" style="color: ${getTemperatureColor(temperature)}">${tempEmoji} ${temperature}</span>
+          ${selectedHotness}
           <a class="selected-link" href="${deal.link}" target="_blank" rel="noopener noreferrer">Open deal</a>
         </div>
       </div>
@@ -523,7 +586,7 @@ const renderSalesList = sales => {
 
       return `
         <article class="sale">
-          <img class="sale-logo" src="${VINTED_LOGO_IMAGE}" alt="Vinted" loading="lazy" />
+          <img class="sale-logo" src="${getSaleImage(sale)}" alt="${sale.title}" loading="lazy" onerror="this.onerror=null;this.src='${VINTED_LOGO_IMAGE}';" />
           <div class="sale-main">
             <a href="${sale.link}" target="_blank" rel="noopener noreferrer">${sale.title}</a>
             <span class="sale-date">${date}</span>
