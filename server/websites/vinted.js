@@ -8,6 +8,8 @@ const isNotDefined = value => {
   return value == null || (typeof value === 'string' && value.trim().length === 0);
 };
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 /**
  * Parse Vinted json response into normalized sales array.
  * @param {Object} data
@@ -80,7 +82,7 @@ const buildSearchParams = (searchText, { relaxed = false } = {}) => {
   return params;
 };
 
-const fetchCatalog = async (searchText, options = {}) => {
+const fetchCatalog = async (searchText, options = {}, retryCount = 0) => {
   const params = buildSearchParams(searchText, options);
 
   const headers = {
@@ -100,6 +102,12 @@ const fetchCatalog = async (searchText, options = {}) => {
     headers,
     referrerPolicy: 'strict-origin-when-cross-origin'
   });
+
+  if (response.status === 429 && retryCount < 3) {
+    const delayMs = 500 * (retryCount + 1);
+    await sleep(delayMs);
+    return fetchCatalog(searchText, options, retryCount + 1);
+  }
 
   if (!response.ok) {
     console.warn(`⚠️  Vinted response ${response.status} for query "${searchText}"`);
@@ -180,10 +188,14 @@ const scrape = async setId => {
       const strictResult = await fetchCatalog(query, { relaxed: false });
       allSales.push(...strictResult);
 
+      // Pace requests to reduce API throttling.
+      await sleep(150);
+
       // If strict query returns nothing, retry once with relaxed filters.
       if (strictResult.length === 0) {
         const relaxedResult = await fetchCatalog(query, { relaxed: true });
         allSales.push(...relaxedResult);
+        await sleep(150);
       }
     }
 

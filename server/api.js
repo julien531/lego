@@ -68,25 +68,88 @@ app.get('/deals', (request, response) => {
 
 app.get('/deals/search', (request, response) => {
   try {
-    const limit = Number(request.query.limit) || 12;
-    const maxPrice = request.query.price ? Number(request.query.price) : Infinity;
-    const minDate = request.query.date ? new Date(request.query.date).getTime() : 0;
-    const filterBy = request.query.filterBy || null;
+    const toNumber = (value, fallback = 0) => {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : fallback;
+    };
+
+    const toTimestamp = value => {
+      if (!value) return 0;
+      const parsed = Date.parse(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    const toDealTimestamp = value => {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed)) return 0;
+      return parsed > 1e12 ? parsed : parsed * 1000;
+    };
+
+    const limit = Math.max(1, toNumber(request.query.limit, 12));
+    const maxPrice = request.query.price ? toNumber(request.query.price, Infinity) : Infinity;
+    const minDate = toTimestamp(request.query.date);
+
+    const filterByRaw = request.query.filterBy;
+    const filterByTokens = Array.isArray(filterByRaw)
+      ? filterByRaw
+      : String(filterByRaw || '')
+        .split(',')
+        .map(token => token.trim())
+        .filter(Boolean);
+
+    const filterBySet = new Set(filterByTokens);
+
+    const minDiscount = Math.max(
+      0,
+      toNumber(request.query.discountThreshold ?? request.query.minDiscount, 0)
+    );
+    const minComments = Math.max(
+      0,
+      toNumber(request.query.commentedThreshold ?? request.query.minComments, 0)
+    );
+    const minHot = toNumber(request.query.hotThreshold ?? request.query.minHot, 0);
+
+    const favoriteIdsRaw = request.query.favorites ?? request.query.favoriteIds ?? '';
+    const favoriteIds = new Set(
+      String(favoriteIdsRaw)
+        .split(',')
+        .map(id => id.trim())
+        .filter(Boolean)
+    );
 
     let filtered = DEALS.filter(deal => {
-      if (Number(deal.price) > maxPrice) return false;
-      if (Number(deal.published) * 1000 < minDate) return false;
+      const dealPrice = toNumber(deal.price, 0);
+      const dealDate = toDealTimestamp(deal.published);
+      const dealDiscount = toNumber(deal.discount, 0);
+      const dealComments = toNumber(deal.comments, 0);
+      const dealHot = toNumber(deal.temperature, 0);
+      const dealUuid = String(deal.uuid || '');
+
+      if (dealPrice > maxPrice) return false;
+      if (minDate && dealDate < minDate) return false;
+
+      if (filterBySet.has('discount') && dealDiscount < minDiscount) return false;
+      if (filterBySet.has('commented') && dealComments < minComments) return false;
+      if (filterBySet.has('hot') && dealHot < minHot) return false;
+      if (filterBySet.has('favorites') && !favoriteIds.has(dealUuid)) return false;
+
       return true;
     });
 
-    // Apply filterBy logic
-    if (filterBy === 'best-discount') {
-      filtered.sort((a, b) => Number(b.discount) - Number(a.discount));
-    } else if (filterBy === 'most-commented') {
-      filtered.sort((a, b) => Number(b.comments) - Number(a.comments));
+    const sortBy = request.query.sort || null;
+
+    if (filterBySet.has('best-discount') || sortBy === 'best-discount') {
+      filtered.sort((a, b) => toNumber(b.discount, 0) - toNumber(a.discount, 0));
+    } else if (filterBySet.has('most-commented') || sortBy === 'most-commented') {
+      filtered.sort((a, b) => toNumber(b.comments, 0) - toNumber(a.comments, 0));
+    } else if (sortBy === 'price-desc' || filterBySet.has('price-desc')) {
+      filtered.sort((a, b) => toNumber(b.price, 0) - toNumber(a.price, 0));
+    } else if (sortBy === 'date-asc' || filterBySet.has('date-asc')) {
+      filtered.sort((a, b) => toDealTimestamp(b.published) - toDealTimestamp(a.published));
+    } else if (sortBy === 'date-desc' || filterBySet.has('date-desc')) {
+      filtered.sort((a, b) => toDealTimestamp(a.published) - toDealTimestamp(b.published));
     } else {
-      // Default: sort by price ascending
-      filtered.sort((a, b) => Number(a.price) - Number(b.price));
+      filtered.sort((a, b) => toNumber(a.price, 0) - toNumber(b.price, 0));
     }
 
     const results = filtered.slice(0, limit);
