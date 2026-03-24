@@ -176,6 +176,7 @@ const fetchDeals = async (page = 1, size = 6) => {
   try {
     const response = await fetch(
       `${API_BASE_URL}/deals?page=${page}&size=${size}`
+      `${API_BASE_URL}/deals?page=${page}&size=${size}`
     );
     const body = await response.json();
 
@@ -711,6 +712,7 @@ const render = (deals, pagination) => {
   renderDeals(sortedDeals);
   renderPagination(pagination);
   renderIndicators(pagination);
+  updateDealIndicators(sortedDeals);
   renderLegoSetIds(deals);
 
   updateFilterButtonsState();
