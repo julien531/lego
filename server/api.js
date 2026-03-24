@@ -262,29 +262,33 @@ app.get('/sales/search', (request, response) => {
 });
 
 
-app.listen(PORT, () => {
-  // when we start the server we load available json files
+// Load data when module initializes
+try {
+  DEALS = JSON.parse(
+    readFileSync(path.join(__dirname, 'sources', 'deals.json'), 'utf8')
+  );
+} catch (error) {
   try {
     DEALS = JSON.parse(
-      readFileSync(path.join(__dirname, 'sources', 'deals.json'), 'utf8')
+      readFileSync(path.join(__dirname, 'sources', 'dealabs.json'), 'utf8')
     );
-  } catch (error) {
-    try {
-      DEALS = JSON.parse(
-        readFileSync(path.join(__dirname, 'sources', 'dealabs.json'), 'utf8')
-      );
-    } catch (dealsError) {
-      console.warn(`⚠️  ${dealsError}`);
-    }
+  } catch (dealsError) {
+    console.warn(`⚠️  ${dealsError}`);
   }
+}
 
-  try {
-    SALES = JSON.parse(
-      readFileSync(path.join(__dirname, 'sources', 'vinted.json'), 'utf8')
-    );
-  } catch (error) {
-    console.warn(`⚠️  ${error}`);
-  }
-})
+try {
+  SALES = JSON.parse(
+    readFileSync(path.join(__dirname, 'sources', 'vinted.json'), 'utf8')
+  );
+} catch (error) {
+  console.warn(`⚠️  ${error}`);
+}
 
-console.log(`📡 Running on port ${PORT}`);
+// Export for Vercel serverless
+export default app;
+
+// For local development
+app.listen(PORT, () => {
+  console.log(`📡 Running on port ${PORT}`);
+});
