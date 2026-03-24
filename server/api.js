@@ -3,20 +3,11 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 
 const PORT = 8092;
 
 const app = express();
 
-// We load json files as data source
-let DEALS = [];
-let SALES = {};
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -110,30 +101,5 @@ app.get('/sales/search', (request, response) => {
   }
 });
 
-
-app.listen(PORT, () => {
-  // when we start the server we load available json files
-  try {
-    DEALS = JSON.parse(
-      readFileSync(path.join(__dirname, 'sources', 'deals.json'), 'utf8')
-    );
-  } catch (error) {
-    try {
-      DEALS = JSON.parse(
-        readFileSync(path.join(__dirname, 'sources', 'dealabs.json'), 'utf8')
-      );
-    } catch (dealsError) {
-      console.warn(`⚠️  ${dealsError}`);
-    }
-  }
-
-  try {
-    SALES = JSON.parse(
-      readFileSync(path.join(__dirname, 'sources', 'vinted.json'), 'utf8')
-    );
-  } catch (error) {
-    console.warn(`⚠️  ${error}`);
-  }
-})
 
 console.log(`📡 Running on port ${PORT}`);
