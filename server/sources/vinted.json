@@ -7077,17 +7077,6 @@
   ],
   "60478": [
     {
-      "link": "https://www.vinted.fr/items/7943447451-lego-plate-modified-1-x-2-with-bar-handle-on-end-60478-light-bluish-gray",
-      "photo": "https://images1.vinted.net/t/05_00f1d_xfsft7q7H6BLKtpSzycYeMkG/f800/1768398784.jpeg?s=c993337e080963fe675b31efcb8662587fecc97e",
-      "price": {
-        "amount": "1.75",
-        "currency_code": "EUR"
-      },
-      "title": "Lego - Plate, Modified 1 x 2 with Bar Handle on End - 60478 Light bluish gray",
-      "published": 1768398784,
-      "uuid": "1cddc603-6890-5667-b8bd-acc38277b1fc"
-    },
-    {
       "link": "https://www.vinted.fr/items/7930962112-lot-lego-crochet-gris-bleu-fonce-60478",
       "photo": "https://images1.vinted.net/t/06_005a7_ccgHTb8qeTfDUpHWEA32W3sY/f800/1768231406.jpeg?s=4e1b68c4d913b559e32a6b475ee49868669f929a",
       "price": {
@@ -7108,6 +7097,17 @@
       "title": "Lot lego crochet gris bleu clair 60478",
       "published": 1768231294,
       "uuid": "801f0914-9044-58d0-8d43-9aa5fcc3ff40"
+    },
+    {
+      "link": "https://www.vinted.fr/items/7930908059-lot-lego-crochet-60478",
+      "photo": "https://images1.vinted.net/t/01_01a65_D7VTdhXna8dt6AZCC3RxQusb/f800/1768231014.jpeg?s=4a5155ec3aaba439123b8caee39deeb63b63b8c0",
+      "price": {
+        "amount": "1.75",
+        "currency_code": "EUR"
+      },
+      "title": "Lot lego crochet 60478",
+      "published": 1768231014,
+      "uuid": "7db11a2a-de4f-54b2-b2a2-bb89308122ca"
     },
     {
       "link": "https://www.vinted.fr/items/7920805153-16-lego-2-ref-18649-12-pieces-et-ref-60478-4-pieces",
@@ -7176,37 +7176,15 @@
       "uuid": "d4790152-f6a5-5c8f-8566-8b3cbda8ef20"
     },
     {
-      "link": "https://www.vinted.fr/items/6318339826-lot-de-40-plate-modified-white-1-x-2-reference-60478",
-      "photo": "https://images1.vinted.net/t/03_014f0_XKGQF2z6yEb5k5MYYjV24e8A/f800/1747089722.jpeg?s=a2d3d5f8e1eb3fbe0c9feb9ebeda36a38c5a2f62",
+      "link": "https://www.vinted.fr/items/6768038524-lego-sfuso-plate-modified-60478",
+      "photo": "https://images1.vinted.net/t/04_00e8a_KjrwZTtUEKmCEsWMGpL9i8QA/f800/r3/1753720679.jpeg?s=974c55387991fbbe2f69fccdd142570ac2fdf962",
       "price": {
-        "amount": "2.26",
+        "amount": "1.75",
         "currency_code": "EUR"
       },
-      "title": "Lot de 40 Plate, Modified white 1 x 2 (référence : 60478)",
-      "published": 1747089722,
-      "uuid": "5df2a624-e882-561f-bbc1-342fc7eb4644"
-    },
-    {
-      "link": "https://www.vinted.fr/items/5438208174-lot-de-30-plate-modified-reddish-brown-1-x-2-reference-60478",
-      "photo": "https://images1.vinted.net/t/02_00483_5ppmPdZV5NzYhH1ezct9uQZn/f800/1732481009.jpeg?s=4617229043d12af1d62f160bf9c0a374dbd9fe61",
-      "price": {
-        "amount": "3.21",
-        "currency_code": "EUR"
-      },
-      "title": "Lot de 30 Plate, Modified reddish brown 1 x 2 (référence : 60478)",
-      "published": 1732481009,
-      "uuid": "8d7a5661-79fb-5aff-b5f9-6ff2515a8b39"
-    },
-    {
-      "link": "https://www.vinted.fr/items/4805769607-lot-de-100-plaques-avec-poignee-de-barre-a-lextremite-blue-12-reference-60478",
-      "photo": "https://images1.vinted.net/t/02_01e9a_4r5WsxsKd1qmbYeo2f9YJobj/f800/1721853406.jpeg?s=8e4766be15e23a0e46fbd3cc0bab4baa49e44d12",
-      "price": {
-        "amount": "8.46",
-        "currency_code": "EUR"
-      },
-      "title": "Lot de 100 plaques avec poignée de barre a l'extrémité blue 1*2 (référence : 60478)",
-      "published": 1721853406,
-      "uuid": "9a0d83f9-6fe9-5ab4-9f45-cad756e31509"
+      "title": "Lego Sfuso Plate Modified 60478",
+      "published": 1753720679,
+      "uuid": "96f03d03-c463-5052-8873-a30c2b6109fd"
     }
   ],
   "60490": [

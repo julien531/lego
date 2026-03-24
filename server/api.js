@@ -66,6 +66,76 @@ app.get('/deals', (request, response) => {
   }
 });
 
+app.get('/deals/search', (request, response) => {
+  try {
+    const limit = Number(request.query.limit) || 12;
+    const maxPrice = request.query.price ? Number(request.query.price) : Infinity;
+    const minDate = request.query.date ? new Date(request.query.date).getTime() : 0;
+    const filterBy = request.query.filterBy || null;
+
+    let filtered = DEALS.filter(deal => {
+      if (Number(deal.price) > maxPrice) return false;
+      if (Number(deal.published) * 1000 < minDate) return false;
+      return true;
+    });
+
+    // Apply filterBy logic
+    if (filterBy === 'best-discount') {
+      filtered.sort((a, b) => Number(b.discount) - Number(a.discount));
+    } else if (filterBy === 'most-commented') {
+      filtered.sort((a, b) => Number(b.comments) - Number(a.comments));
+    } else {
+      // Default: sort by price ascending
+      filtered.sort((a, b) => Number(a.price) - Number(b.price));
+    }
+
+    const results = filtered.slice(0, limit);
+
+    return response.status(200).json({
+      success: true,
+      limit,
+      total: filtered.length,
+      results
+    });
+  } catch (error) {
+    console.log(error);
+    return response.status(500).json({
+      success: false,
+      limit: 0,
+      total: 0,
+      results: [],
+      message: error.message
+    });
+  }
+});
+
+app.get('/deals/:id', (request, response) => {
+  try {
+    const { id } = request.params;
+    const deal = DEALS.find(d => String(d.uuid) === String(id));
+
+    if (!deal) {
+      return response.status(404).json({
+        success: false,
+        data: null,
+        message: 'Deal not found'
+      });
+    }
+
+    return response.status(200).json({
+      success: true,
+      data: deal
+    });
+  } catch (error) {
+    console.log(error);
+    return response.status(500).json({
+      success: false,
+      data: null,
+      message: error.message
+    });
+  }
+});
+
 app.get('/sales', (request, response) => {
   try {
     const { id } = request.query;
@@ -95,17 +165,35 @@ app.get('/sales/search', (request, response) => {
 
   try {
     const { legoSetId } = request.query;
-    const result = SALES[legoSetId] || []
+    const limit = Number(request.query.limit) || 12;
+    
+    let result = SALES[legoSetId] || [];
+    
+    // Sort by date descending (most recent first)
+    result = Array.isArray(result) ? [...result] : [];
+    result.sort((a, b) => {
+      const aTime = Number(a.published) || 0;
+      const bTime = Number(b.published) || 0;
+      return bTime - aTime;
+    });
+
+    // Apply limit
+    const results = result.slice(0, limit);
 
     return response.status(200).json({
-      'success': true,
-      'data': {'result': result}
+      success: true,
+      limit,
+      total: result.length,
+      results
     });
   } catch (error) {
     console.log(error);
-    return response.status(404).send({
-      'success': false,
-      'data': {'result': []}
+    return response.status(500).json({
+      success: false,
+      limit: 0,
+      total: 0,
+      results: [],
+      message: error.message
     });
   }
 });
