@@ -73,6 +73,14 @@ const spanP25Sales = document.querySelector('#p25SalesValue');
 const spanP50Sales = document.querySelector('#p50SalesValue');
 const spanLifetimeSales = document.querySelector('#lifetimeSalesValue');
 
+const getDealSetId = deal => {
+  const direct = String(deal?.id || deal?.reference || '').trim();
+  if (direct) return direct;
+
+  const fromTitle = String(deal?.title || '').match(/\b\d{4,6}\b/);
+  return fromTitle ? fromTitle[0] : '';
+};
+
 const toNumber = value => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
@@ -149,7 +157,7 @@ const getSafeImageHtml = (src, alt, className = '') => {
 };
 
 const getDealById = (deals, id) => {
-  return deals.find(deal => String(deal.id) === String(id));
+  return deals.find(deal => String(deal.setId || getDealSetId(deal)) === String(id));
 };
 
 const getSaleImage = sale => {
@@ -162,7 +170,10 @@ const getSaleImage = sale => {
  * @param {Object} meta - pagination meta info
  */
 const setCurrentDeals = ({result, meta}) => {
-  currentDeals = result;
+  currentDeals = (result || []).map(deal => ({
+    ...deal,
+    setId: getDealSetId(deal)
+  }));
   currentPagination = meta;
 };
 
@@ -236,7 +247,7 @@ const renderDeals = deals => {
 
   if (!deals || deals.length === 0) {
     sectionDeals.innerHTML = `
-      <h2>Dealabs deals</h2>
+      <h2>Deals (Dealabs + Avenue de la Brique)</h2>
       <p class="muted-state">No deal matches your current filters.</p>
     `;
     footer.innerHTML = `
@@ -280,7 +291,7 @@ const renderDeals = deals => {
             ${temperatureBadge}
           </a>
           <div class="deal-body">
-            <span class="deal-id">Set #${deal.id}</span>
+            <span class="deal-id">Set #${deal.setId || 'N/A'}</span>
             <a class="deal-title" href="${deal.link}" target="_blank" rel="noopener noreferrer">${deal.title}</a>
             <div class="deal-prices">
               <span class="deal-original-price">${formatPrice(originalPrice)}</span>
@@ -315,7 +326,7 @@ const renderDeals = deals => {
     </div>
   `;
 
-  sectionDeals.innerHTML = '<h2>Dealabs deals</h2>';
+  sectionDeals.innerHTML = '<h2>Deals (Dealabs + Avenue de la Brique)</h2>';
   sectionDeals.appendChild(div);
   sectionDeals.appendChild(footer);
 };
@@ -343,21 +354,22 @@ const renderLegoSetIds = deals => {
   const selectedId = selectLegoSetIds.value;
   const seen = new Set();
   const uniqueDeals = deals.filter(deal => {
-    const id = String(deal.id);
+    const id = String(deal.setId || getDealSetId(deal));
+    if (!id) return false;
     if (seen.has(id)) return false;
     seen.add(id);
     return true;
   });
 
-  const options = uniqueDeals.map(deal => `<option value="${deal.id}">${deal.id}</option>`).join('');
+  const options = uniqueDeals.map(deal => `<option value="${deal.setId}">${deal.setId}</option>`).join('');
 
   selectLegoSetIds.innerHTML = options;
 
-  const availableIds = uniqueDeals.map(deal => String(deal.id));
+  const availableIds = uniqueDeals.map(deal => String(deal.setId));
   if (selectedId && availableIds.includes(String(selectedId))) {
     selectLegoSetIds.value = selectedId;
   } else if (uniqueDeals.length > 0) {
-    selectLegoSetIds.value = String(uniqueDeals[0].id);
+    selectLegoSetIds.value = String(uniqueDeals[0].setId);
   }
 
   renderLegoDropdownMenu(uniqueDeals);
@@ -378,12 +390,12 @@ const setLegoDropdownSelection = deal => {
     legoSetDropdownImage.onerror = null;
     legoSetDropdownImage.src = FALLBACK_DEAL_IMAGE;
   };
-  legoSetDropdownText.textContent = `Set #${deal.id}`;
+  legoSetDropdownText.textContent = `Set #${deal.setId || 'N/A'}`;
 
   if (legoSetDropdownMenu) {
     const items = legoSetDropdownMenu.querySelectorAll('.lego-dropdown-item');
     items.forEach(item => {
-      item.classList.toggle('active', item.dataset.id === String(deal.id));
+      item.classList.toggle('active', item.dataset.id === String(deal.setId));
     });
   }
 };
@@ -399,9 +411,9 @@ const renderLegoDropdownMenu = deals => {
   const template = deals
     .map(deal => {
       return `
-        <button type="button" class="lego-dropdown-item" data-id="${deal.id}" role="option" aria-selected="false">
-          ${getSafeImageHtml(getDealImage(deal), `Set ${deal.id}`)}
-          <span>Set #${deal.id}</span>
+        <button type="button" class="lego-dropdown-item" data-id="${deal.setId}" role="option" aria-selected="false">
+          ${getSafeImageHtml(getDealImage(deal), `Set ${deal.setId}`)}
+          <span>Set #${deal.setId}</span>
         </button>
       `;
     })
@@ -443,8 +455,8 @@ const handleLegoSetSelection = async (id, shouldScroll = true) => {
  * @param  {Object} pagination
  */
 const renderIndicators = pagination => {
-  const {count} = pagination;
-  spanNbDeals.textContent = count;
+  const totalDeals = toNumber(pagination && (pagination.total ?? pagination.count));
+  spanNbDeals.textContent = String(totalDeals);
 
   if (!currentDeals || currentDeals.length === 0) return;
 
@@ -497,7 +509,7 @@ const renderSelectedSet = deal => {
     <article class="selected-card">
       ${getSafeImageHtml(image, deal.title, 'selected-image')}
       <div class="selected-content">
-        <span class="selected-id">Set #${deal.id}</span>
+        <span class="selected-id">Set #${deal.setId || 'N/A'}</span>
         <p class="selected-title">${deal.title}</p>
         <div class="selected-prices">
           <span class="selected-original-price">${formatPrice(originalPrice)}</span>
@@ -700,6 +712,38 @@ const applySort = deals => {
   }
 
   return sorted;
+};
+
+const updateDealIndicators = deals => {
+  const spanAvgDiscount = document.querySelector('#avgDiscountValue');
+  const spanMaxDiscount = document.querySelector('#maxDiscountValue');
+  const spanAvgTemp = document.querySelector('#avgTempValue');
+  const spanMaxTemp = document.querySelector('#maxTempValue');
+
+  if (!spanAvgDiscount || !spanMaxDiscount || !spanAvgTemp || !spanMaxTemp) {
+    return;
+  }
+
+  if (!deals || deals.length === 0) {
+    spanAvgDiscount.textContent = '0%';
+    spanMaxDiscount.textContent = '0%';
+    spanAvgTemp.textContent = '0';
+    spanMaxTemp.textContent = '0';
+    return;
+  }
+
+  const discounts = deals.map(deal => toNumber(deal.discount)).filter(value => value > 0);
+  const temperatures = deals.map(deal => toNumber(deal.temperature)).filter(value => Number.isFinite(value));
+
+  const avgDiscount = discounts.length > 0 ? discounts.reduce((sum, value) => sum + value, 0) / discounts.length : 0;
+  const maxDiscount = discounts.length > 0 ? Math.max(...discounts) : 0;
+  const avgTemp = temperatures.length > 0 ? temperatures.reduce((sum, value) => sum + value, 0) / temperatures.length : 0;
+  const maxTemp = temperatures.length > 0 ? Math.max(...temperatures) : 0;
+
+  spanAvgDiscount.textContent = `${avgDiscount.toFixed(1)}%`;
+  spanMaxDiscount.textContent = `${maxDiscount}%`;
+  spanAvgTemp.textContent = `${avgTemp.toFixed(0)}`;
+  spanMaxTemp.textContent = `${maxTemp}`;
 };
 
 const render = (deals, pagination) => {
