@@ -24,10 +24,13 @@ This endpoint accepts the following optional query string parameters:
 // current deals on the page
 let currentDeals = [];
 let currentPagination = {};
+let currentSales = [];
 let activeFilter = null;
 let activeSort = null;
 let currentShowSize = 6;
 let activeThresholdFilter = null;
+let salesSortField = 'date';
+let salesSortDirection = 'desc';
 
 const filterThresholds = {
   discount: 50,
@@ -84,6 +87,60 @@ const getDealSetId = deal => {
 const toNumber = value => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const pickColorByThresholds = (value, thresholds) => {
+  for (const threshold of thresholds) {
+    if (value >= threshold.min) {
+      return threshold.color;
+    }
+  }
+
+  return '#64748b';
+};
+
+const setIndicatorColor = (node, color) => {
+  if (!node) return;
+  node.style.backgroundColor = color;
+};
+
+const pickColorFromRange = (value, min, max) => {
+  if (!Number.isFinite(value) || !Number.isFinite(min) || !Number.isFinite(max) || max <= min) {
+    return '#64748b';
+  }
+
+  const ratio = (value - min) / (max - min);
+
+  if (ratio >= 0.8) return '#ef4444';
+  if (ratio >= 0.6) return '#f59e0b';
+  if (ratio >= 0.4) return '#16a34a';
+  if (ratio >= 0.2) return '#0ea5e9';
+  return '#64748b';
+};
+
+const getSortArrow = (field) => {
+  if (salesSortField !== field) return '';
+  return salesSortDirection === 'asc' ? '↑' : '↓';
+};
+
+const sortSales = sales => {
+  const sorted = (sales || []).slice();
+
+  const getValue = sale => {
+    if (salesSortField === 'price') {
+      return toNumber(sale?.price?.amount);
+    }
+
+    return toNumber(sale?.published);
+  };
+
+  sorted.sort((a, b) => {
+    const aVal = getValue(a);
+    const bVal = getValue(b);
+    return salesSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+  });
+
+  return sorted;
 };
 
 const formatPrice = (amount, currency) => {
@@ -442,8 +499,9 @@ const handleLegoSetSelection = async (id, shouldScroll = true) => {
   setLegoDropdownSelection(selectedDeal);
 
   const salesData = await fetchSales(id);
+  currentSales = Array.isArray(salesData) ? salesData : [];
   renderSalesIndicators(salesData);
-  renderSalesList(salesData);
+  renderSalesList(currentSales);
 
   if (shouldScroll) {
     sectionSales.scrollIntoView({behavior: 'smooth', block: 'start'});
@@ -457,6 +515,21 @@ const handleLegoSetSelection = async (id, shouldScroll = true) => {
 const renderIndicators = pagination => {
   const totalDeals = toNumber(pagination && (pagination.total ?? pagination.count));
   spanNbDeals.textContent = String(totalDeals);
+
+  setIndicatorColor(
+    spanNbDeals,
+    pickColorByThresholds(totalDeals, [
+      {min: 60, color: '#7f1d1d'},
+      {min: 45, color: '#b91c1c'},
+      {min: 30, color: '#15803d'},
+      {min: 24, color: '#16a34a'},
+      {min: 20, color: '#16a34a'},
+      {min: 16, color: '#65a30d'},
+      {min: 12, color: '#65a30d'},
+      {min: 8, color: '#0ea5e9'},
+      {min: 6, color: '#0ea5e9'}
+    ])
+  );
 
   if (!currentDeals || currentDeals.length === 0) return;
 
@@ -485,6 +558,66 @@ const renderIndicators = pagination => {
   if (spanMaxDiscount) spanMaxDiscount.textContent = `${maxDiscount}%`;
   if (spanAvgTemp) spanAvgTemp.textContent = `${avgTemp.toFixed(0)}`;
   if (spanMaxTemp) spanMaxTemp.textContent = `${maxTemp}`;
+
+  setIndicatorColor(
+    spanAvgDiscount,
+    pickColorByThresholds(avgDiscount, [
+      {min: 90, color: '#7f1d1d'},
+      {min: 80, color: '#ef4444'},
+      {min: 65, color: '#f97316'},
+      {min: 50, color: '#f59e0b'},
+      {min: 40, color: '#facc15'},
+      {min: 30, color: '#eab308'},
+      {min: 22, color: '#22c55e'},
+      {min: 15, color: '#16a34a'},
+      {min: 8, color: '#0ea5e9'}
+    ])
+  );
+
+  setIndicatorColor(
+    spanMaxDiscount,
+    pickColorByThresholds(maxDiscount, [
+      {min: 90, color: '#7f1d1d'},
+      {min: 80, color: '#ef4444'},
+      {min: 65, color: '#f97316'},
+      {min: 50, color: '#f59e0b'},
+      {min: 40, color: '#facc15'},
+      {min: 30, color: '#eab308'},
+      {min: 22, color: '#22c55e'},
+      {min: 15, color: '#16a34a'},
+      {min: 8, color: '#0ea5e9'}
+    ])
+  );
+
+  setIndicatorColor(
+    spanAvgTemp,
+    pickColorByThresholds(avgTemp, [
+      {min: 400, color: '#7f1d1d'},
+      {min: 250, color: '#ef4444'},
+      {min: 180, color: '#f97316'},
+      {min: 120, color: '#f59e0b'},
+      {min: 80, color: '#facc15'},
+      {min: 60, color: '#eab308'},
+      {min: 35, color: '#22c55e'},
+      {min: 20, color: '#0ea5e9'},
+      {min: 10, color: '#94a3b8'}
+    ])
+  );
+
+  setIndicatorColor(
+    spanMaxTemp,
+    pickColorByThresholds(maxTemp, [
+      {min: 700, color: '#7f1d1d'},
+      {min: 500, color: '#ef4444'},
+      {min: 350, color: '#f97316'},
+      {min: 250, color: '#f59e0b'},
+      {min: 180, color: '#facc15'},
+      {min: 120, color: '#eab308'},
+      {min: 70, color: '#22c55e'},
+      {min: 40, color: '#0ea5e9'},
+      {min: 20, color: '#94a3b8'}
+    ])
+  );
 };
 
 const renderSelectedSet = deal => {
@@ -534,6 +667,13 @@ const renderSalesIndicators = sales => {
     spanP25Sales.textContent = '0';
     spanP50Sales.textContent = '0';
     spanLifetimeSales.textContent = '0 days';
+
+    setIndicatorColor(spanNbSales, '#64748b');
+    setIndicatorColor(spanAvgSales, '#64748b');
+    setIndicatorColor(spanP5Sales, '#64748b');
+    setIndicatorColor(spanP25Sales, '#64748b');
+    setIndicatorColor(spanP50Sales, '#64748b');
+    setIndicatorColor(spanLifetimeSales, '#64748b');
     return;
   }
 
@@ -558,6 +698,12 @@ const renderSalesIndicators = sales => {
   spanP25Sales.textContent = formatPrice(getPercentile(prices, 0.25), sales[0].price && sales[0].price.currency_code);
   spanP50Sales.textContent = formatPrice(getPercentile(prices, 0.5), sales[0].price && sales[0].price.currency_code);
 
+  const p5 = getPercentile(prices, 0.05);
+  const p25 = getPercentile(prices, 0.25);
+  const p50 = getPercentile(prices, 0.5);
+  const minPrice = prices.length > 0 ? prices[0] : 0;
+  const maxPrice = prices.length > 0 ? prices[prices.length - 1] : 0;
+
   const dates = sales.map(sale => toNumber(sale.published));
   const minDate = Math.min(...dates);
   const maxDate = Math.max(...dates);
@@ -565,6 +711,41 @@ const renderSalesIndicators = sales => {
   const lifetime80Days = Math.floor(lifetimeDays * 0.8);
 
   spanLifetimeSales.textContent = `${lifetime80Days} days`;
+
+  setIndicatorColor(
+    spanNbSales,
+    pickColorByThresholds(sales.length, [
+      {min: 150, color: '#7f1d1d'},
+      {min: 100, color: '#b91c1c'},
+      {min: 80, color: '#15803d'},
+      {min: 65, color: '#16a34a'},
+      {min: 50, color: '#16a34a'},
+      {min: 35, color: '#65a30d'},
+      {min: 25, color: '#65a30d'},
+      {min: 15, color: '#0ea5e9'},
+      {min: 10, color: '#0ea5e9'}
+    ])
+  );
+
+  setIndicatorColor(spanAvgSales, pickColorFromRange(average, minPrice, maxPrice));
+  setIndicatorColor(spanP5Sales, pickColorFromRange(p5, minPrice, maxPrice));
+  setIndicatorColor(spanP25Sales, pickColorFromRange(p25, minPrice, maxPrice));
+  setIndicatorColor(spanP50Sales, pickColorFromRange(p50, minPrice, maxPrice));
+
+  setIndicatorColor(
+    spanLifetimeSales,
+    pickColorByThresholds(lifetime80Days, [
+      {min: 260, color: '#7f1d1d'},
+      {min: 210, color: '#b91c1c'},
+      {min: 180, color: '#15803d'},
+      {min: 130, color: '#16a34a'},
+      {min: 90, color: '#16a34a'},
+      {min: 65, color: '#65a30d'},
+      {min: 45, color: '#65a30d'},
+      {min: 30, color: '#0ea5e9'},
+      {min: 20, color: '#0ea5e9'}
+    ])
+  );
 };
 
 const renderSalesList = sales => {
@@ -579,8 +760,20 @@ const renderSalesList = sales => {
   const selectedDealId = selectLegoSetIds.value;
   const selectedDeal = getDealById(currentDeals, selectedDealId);
   const dealabsPrice = selectedDeal ? toNumber(selectedDeal.price) : null;
+  const sortedSales = sortSales(sales);
 
-  const template = sales
+  const salesToolbar = `
+    <div class="sales-toolbar" aria-label="Sort Vinted sales">
+      <button type="button" class="sales-sort-btn ${salesSortField === 'date' ? 'active' : ''}" data-sales-sort="date">
+        Date ${getSortArrow('date')}
+      </button>
+      <button type="button" class="sales-sort-btn ${salesSortField === 'price' ? 'active' : ''}" data-sales-sort="price">
+        Price ${getSortArrow('price')}
+      </button>
+    </div>
+  `;
+
+  const template = sortedSales
     .map(sale => {
       const date = new Date(toNumber(sale.published) * 1000).toLocaleDateString();
       const vintedPrice = toNumber(sale.price.amount);
@@ -612,6 +805,7 @@ const renderSalesList = sales => {
 
   sectionSales.innerHTML = `
     <h2>Vinted sales</h2>
+    ${salesToolbar}
     <div class="sales-list">
       ${template}
     </div>
@@ -953,4 +1147,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   } else {
     setLegoDropdownSelection(null);
   }
+});
+
+sectionSales.addEventListener('click', event => {
+  const sortBtn = event.target.closest('.sales-sort-btn[data-sales-sort]');
+  if (!sortBtn) return;
+
+  const field = sortBtn.dataset.salesSort;
+  if (!field) return;
+
+  if (salesSortField === field) {
+    salesSortDirection = salesSortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    salesSortField = field;
+    salesSortDirection = field === 'date' ? 'desc' : 'asc';
+  }
+
+  renderSalesList(currentSales);
 });
